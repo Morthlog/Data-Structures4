@@ -5,7 +5,7 @@
  */
 public class Node<KEY, DATA> 
 {
-	KEY key ;
+	protected KEY key ;
     protected DATA data;
     protected Node<KEY, DATA> next = null;
     protected Node<KEY, DATA> prev = null;
@@ -16,8 +16,9 @@ public class Node<KEY, DATA>
      * @param data the data stored
      * @return
      */
-    Node(DATA data) 
+    Node(KEY key, DATA data) 
     {
+    	this.key = key;
         this.data = data;
     }
 
@@ -32,6 +33,11 @@ public class Node<KEY, DATA>
         return data;
     }
     
+    public KEY getKey() 
+    {
+        // return key stored in this node
+        return key;
+    }
     /**
      * Get reference to next node
      *
