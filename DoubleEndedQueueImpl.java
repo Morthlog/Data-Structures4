@@ -15,9 +15,9 @@ public class  DoubleEndedQueueImpl<KEY, VALUE> implements DoubleEndedQueue<KEY, 
     /**
 	 * inserts data of type T at the front of the queue
 	 */	
-	public void addFirst(VALUE data)
+	public void addFirst(KEY key, VALUE data)
 	{
-		Node<KEY, VALUE> n = new Node<>(data);
+		Node<KEY, VALUE> n = new Node<KEY, VALUE>(key, data);
 
         if (isEmpty()) 
         {
@@ -66,9 +66,9 @@ public class  DoubleEndedQueueImpl<KEY, VALUE> implements DoubleEndedQueue<KEY, 
 	/**
 	 * inserts data of type T at the end of the queue
 	 */
-	public void addLast(VALUE data)
+	public void addLast(KEY key, VALUE data)
 	{
-		Node<KEY, VALUE> n = new Node<>(data);
+		Node<KEY, VALUE> n = new Node<KEY, VALUE>(key,data);
 
         if (isEmpty()) 
         {

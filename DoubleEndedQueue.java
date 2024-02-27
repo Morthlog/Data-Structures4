@@ -14,7 +14,7 @@ public interface DoubleEndedQueue<KEY, VALUE>
 	/**
 	 * inserts data of type T at the front of the queue
 	 */
-	public void addFirst(VALUE item);
+	public void addFirst(KEY key, VALUE data);
 
 	/**
 	 * removes and returns the data at the front of the queue
@@ -26,7 +26,7 @@ public interface DoubleEndedQueue<KEY, VALUE>
 	/**
 	 * inserts data of type T at the end of the queue
 	 */
-	public void addLast(VALUE item);
+	public void addLast(KEY key, VALUE data);
 
 	/**
 	 * removes and returns the data from the end of the queue
