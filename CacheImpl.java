@@ -6,19 +6,24 @@ public class CacheImpl<K, V> implements Cache<K, V> {
 
     protected Node<K, V>[] cachedData;
     //* HashMap
-    //protected HashMap<K, Integer> dataPointer = new HashMap<K, Integer>();
+    protected LinearProbingHashST<K, Integer> dataPointer ;
     int size = 0, sizeMax;
-    Node<K, V> first = null, last = null;
+    int first = -1, last = -1;
+    int misses = 0, hits=0, lookups=0;
+  
+    @SuppressWarnings("unchecked")
     CacheImpl()
     {
         sizeMax = 100;
         cachedData = new Node[sizeMax];
     }
 
+    @SuppressWarnings("unchecked")
     CacheImpl(int size)
     {
         this.sizeMax = size;
         cachedData = new Node[sizeMax];
+        dataPointer = new LinearProbingHashST<K, Integer>(sizeMax);
     }
 
 /**
@@ -28,36 +33,38 @@ public class CacheImpl<K, V> implements Cache<K, V> {
 	 */
 	public V lookUp(K key)
     {
-        int hashedKey = key.hashCode() % size;
+		lookups++;
         int index = 0;
         //! search in HashMap for key and return the node's data
-        //index = dataPointer.search(hashedKey);
+        index = dataPointer.get(key);
         if (index == -1)
         {
+        	misses++;
             return null;
         }
         else
         {
-            if (cachedData[index] == last)
+        	hits++;
+            if (index == last)
             {
-                first.next = last;
-                last = last.next;
+                cachedData[first].next = last;
+                last = cachedData[last].next;
                 
-                last.prev = null;
-                first.next.next = null;
+                cachedData[last].prev = -1;
+                cachedData[cachedData[first].next].next = -1;
                 
-                first.next.prev = first;
-                first = first.next;
+                cachedData[cachedData[first].next].prev = first;
+                first = cachedData[first].next;
             }
-            else if (cachedData[index] != first) // no position update needed
+            else if (index != first) // no position update needed
             {
-                cachedData[index].prev.next = cachedData[index].next;
-                cachedData[index].next.prev = cachedData[index].prev;
+                cachedData[cachedData[index].prev].next = cachedData[index].next;
+                cachedData[cachedData[index].next].prev = cachedData[index].prev;
 
-                first.next = cachedData[index];
+                cachedData[first].next = index;
                 cachedData[index].prev = first;
-                cachedData[index].next = null;
-                first = cachedData[index];
+                cachedData[index].next = -1;
+                first = index;
             }
 
             return cachedData[index].getData();
@@ -74,46 +81,45 @@ public class CacheImpl<K, V> implements Cache<K, V> {
     {
         if (sizeMax<=size)
         {
-            K lastKey = last.getKey();
-            first.next = last;
+            K lastKey = cachedData[last].getKey();
+            cachedData[first].next = last;
             // replace data of last with new data
-            last.data = value;
-            last.key = key;
-            last.prev = first;
+            cachedData[last].data = value;
+            cachedData[last].key = key;
+            cachedData[last].prev = first;
 
             // remove connection between last and second from last
-            last = last.next;
-            last.prev.next = null;
-            last.prev = null;
+            last = cachedData[last].next;
+            cachedData[cachedData[last].prev].next = -1;
+            cachedData[last].prev = -1;
 
             // finish movement of last to the start
-            first.next.prev = first;
-            first = first.next;
+            cachedData[cachedData[first].next].prev = first;
+            first = cachedData[first].next;
             
-            //! add to hashMap which points to index of lastKey
-
             //! delete lastKey from hashMap
-            // dataPointer.remove(lastKey);         
-            
-             
+            dataPointer.delete(lastKey);   
+
+            //! add to hashMap which points to index of lastKey, which is now first
+            dataPointer.put(key, first);
         }
         else
         {
             cachedData[size] = new Node<K, V>(key, value);
             if (size == 0)
             {
-                first = cachedData[size];
+                first = size;
                 last = first;
             }
             else
             {
-                cachedData[size].prev = cachedData[size-1];
-                cachedData[size-1].next = cachedData[size];
-                first = cachedData[size];
+                cachedData[size].prev = first;
+                cachedData[first].next = size;
+                first = size;
             }
 
-            //! add to hashMap which points to size
-
+            //! add to hashMap which points to first
+            dataPointer.put(key, first);
             ++size;
         }
     }
@@ -124,7 +130,11 @@ public class CacheImpl<K, V> implements Cache<K, V> {
 	 */
 	public double getHitRatio()
     {
-        return -1;
+		if(lookups>0)
+			return hits/lookups;
+		else		
+			return 0;
+		
     }
 	
 	/**
@@ -132,7 +142,7 @@ public class CacheImpl<K, V> implements Cache<K, V> {
 	 */
 	public long getHits()
     {
-        return -1;
+        return hits;
     }
 	
 	/**
@@ -140,7 +150,7 @@ public class CacheImpl<K, V> implements Cache<K, V> {
 	 */
 	public long getMisses()
     {
-        return -1;
+        return misses;
     }
 	
 	/**
@@ -148,6 +158,7 @@ public class CacheImpl<K, V> implements Cache<K, V> {
 	 */
 	public long getNumberOfLookUps()
     {
-        return -1;
+        return lookups;
     }
+	
 }

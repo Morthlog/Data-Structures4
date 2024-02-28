@@ -7,8 +7,8 @@ public class Node<KEY, DATA>
 {
 	protected KEY key ;
     protected DATA data;
-    protected Node<KEY, DATA> next = null;
-    protected Node<KEY, DATA> prev = null;
+    protected int next = -1;
+    protected int prev = -1;
 
     /**
      * Constructor. Sets data
@@ -43,13 +43,13 @@ public class Node<KEY, DATA>
      *
      * @return the next node
      */
-    public Node<KEY, DATA> getNext() 
+    public int getNext() 
     {
         // get next node
         return next;
     }
 
-    public Node<KEY, DATA> getPrev() 
+    public int getPrev() 
     {
         // get next node
         return prev;
@@ -60,7 +60,7 @@ public class Node<KEY, DATA>
      *
      * @param next reference
      */
-    public void setNext(Node<KEY, DATA> next) 
+    public void setNext(int next) 
     {
         this.next = next;
     }
@@ -71,7 +71,7 @@ public class Node<KEY, DATA>
      *
      * @param prev reference
      */
-    public void setPrev(Node<KEY, DATA> prev) 
+    public void setPrev(int prev) 
     {
         this.prev = prev;
     }
