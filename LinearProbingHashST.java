@@ -31,7 +31,8 @@ public class LinearProbingHashST<Key>
     */
    public LinearProbingHashST(int capacity)
    {
-       m = nearestPowerOfTwo(capacity);
+       m = 2*nearestPowerOfTwo(capacity);
+//	   m=2*capacity;
        n = 0;
        keys = (Key[])   new Object[m];
        indexes = new int[m];

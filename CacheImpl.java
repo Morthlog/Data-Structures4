@@ -9,7 +9,7 @@ public class CacheImpl<K, V> implements Cache<K, V> {
     protected LinearProbingHashST<K> dataPointer ;
     int size = 0, sizeMax;
     int first = -1, last = -1;
-    int misses = 0, hits=0, lookups=0;
+    long misses = 0, hits=0, lookups=0;
   
     @SuppressWarnings("unchecked")
     CacheImpl()
@@ -130,11 +130,11 @@ public class CacheImpl<K, V> implements Cache<K, V> {
 	 */
 	public double getHitRatio()
     {
-		if(lookups>0)
-			return hits/lookups;
-		else		
-			return 0;
-		
+		if(lookups>0.0f)		
+			return (double) hits/lookups;	
+			
+		else	
+			return 0;		
     }
 	
 	/**
