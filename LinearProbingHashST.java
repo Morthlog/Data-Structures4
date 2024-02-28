@@ -4,7 +4,8 @@
 /*  @author Robert Sedgewick
 *  @author Kevin Wayne
 */
-public class LinearProbingHashST<Key, Value> {
+public class LinearProbingHashST<Key, Value> 
+{
 
    // must be a power of 2
    private static final int INIT_CAPACITY = 4;
@@ -30,13 +31,18 @@ public class LinearProbingHashST<Key, Value> {
     */
    public LinearProbingHashST(int capacity)
    {
-       m = 2*capacity;
+       m = nearestPowerOfTwo(capacity);
        n = 0;
        keys = (Key[])   new Object[m];
        vals = (Value[]) new Object[m];
    }
 
-   
+   int nearestPowerOfTwo(int capacity)
+   {
+	   int nearestPower;
+	   for(nearestPower = 2; nearestPower < capacity; nearestPower *= 2) {} 
+	   return nearestPower;
+   }
    /**
     * Returns the number of key-value pairs in this symbol table.
     *
@@ -58,20 +64,6 @@ public class LinearProbingHashST<Key, Value> {
        return size() == 0;
    }
 
-   /**
-    * Returns true if this symbol table contains the specified key.
-    *
-    * @param  key the key
-    * @return {@code true} if this symbol table contains {@code key};
-    *         {@code false} otherwise
-    * @throws IllegalArgumentException if {@code key} is {@code null}
-    */
-   public boolean contains(Key key) 
-   {
-       if (key == null) 
-    	   throw new IllegalArgumentException("argument to contains() is null");
-       return get(key) != null;
-   }
 
    // hash function for keys - returns value between 0 and m-1
    private int hashTextbook(Key key) 
@@ -139,7 +131,7 @@ public class LinearProbingHashST<Key, Value> {
        }
        keys[i] = key;
        vals[i] = val;
-       n++;
+       ++n;
    }
 
    /**
@@ -173,37 +165,37 @@ public class LinearProbingHashST<Key, Value> {
    {
        if (key == null) 
     	   throw new IllegalArgumentException("argument to delete() is null");
-       if (!contains(key)) return;
 
-       // find position i of key
-       int i = hash(key);
-       while (!key.equals(keys[i])) 
+       // find position i of key      
+       for (int i = hash(key); keys[i] != null; i = (i + 1) % m) 
        {
-           i = (i + 1) % m;
-       }
+           if (key.equals(keys[i]))
+           {
+        	   // delete key and associated value
+               keys[i] = null;
+               vals[i] = null;
+               
+               // rehash all keys in same cluster
+               i = (i + 1) % m;
+               while (keys[i] != null) 
+               {
+                   // delete keys[i] and vals[i] and reinsert
+                   Key   keyToRehash = keys[i];
+                   Value valToRehash = vals[i];
+                   keys[i] = null;
+                   vals[i] = null;
+                   --n;
+                   put(keyToRehash, valToRehash);
+                   i = (i + 1) % m;
+               }
 
-       // delete key and associated value
-       keys[i] = null;
-       vals[i] = null;
-
-       // rehash all keys in same cluster
-       i = (i + 1) % m;
-       while (keys[i] != null) 
-       {
-           // delete keys[i] and vals[i] and reinsert
-           Key   keyToRehash = keys[i];
-           Value valToRehash = vals[i];
-           keys[i] = null;
-           vals[i] = null;
-           n--;
-           put(keyToRehash, valToRehash);
-           i = (i + 1) % m;
-       }
-
-       n--;
-
-       // halves size of array if it's 12.5% full or less
-       if (n > 0 && n <= m/8) resize(m/2);
+               --n;
+               // halves size of array if it's 12.5% full or less
+               if (n > 0 && n <= m/8) resize(m/2);
+               
+               break;
+           	}
+       }       
    }
 }
 
