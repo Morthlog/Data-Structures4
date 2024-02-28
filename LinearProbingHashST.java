@@ -4,7 +4,8 @@
 /*  @author Robert Sedgewick
 *  @author Kevin Wayne
 */
-public class LinearProbingHashST<Key, Value> {
+public class LinearProbingHashST<Key> 
+{
 
    // must be a power of 2
    private static final int INIT_CAPACITY = 4;
@@ -12,7 +13,7 @@ public class LinearProbingHashST<Key, Value> {
    private int n;           // number of key-value pairs in the symbol table
    private int m;           // size of linear probing table
    private Key[] keys;      // the keys
-   private Value[] vals;    // the values
+   private int[] indexes;    // the values
 
 
    /**
@@ -30,13 +31,19 @@ public class LinearProbingHashST<Key, Value> {
     */
    public LinearProbingHashST(int capacity)
    {
-       m = 2*capacity;
+       m = 2*nearestPowerOfTwo(capacity);
+//	   m=2*capacity;
        n = 0;
        keys = (Key[])   new Object[m];
-       vals = (Value[]) new Object[m];
+       indexes = new int[m];
    }
 
-   
+   int nearestPowerOfTwo(int capacity)
+   {
+	   int nearestPower;
+	   for(nearestPower = 2; nearestPower < capacity; nearestPower *= 2) {} 
+	   return nearestPower;
+   }
    /**
     * Returns the number of key-value pairs in this symbol table.
     *
@@ -58,20 +65,6 @@ public class LinearProbingHashST<Key, Value> {
        return size() == 0;
    }
 
-   /**
-    * Returns true if this symbol table contains the specified key.
-    *
-    * @param  key the key
-    * @return {@code true} if this symbol table contains {@code key};
-    *         {@code false} otherwise
-    * @throws IllegalArgumentException if {@code key} is {@code null}
-    */
-   public boolean contains(Key key) 
-   {
-       if (key == null) 
-    	   throw new IllegalArgumentException("argument to contains() is null");
-       return get(key) != null;
-   }
 
    // hash function for keys - returns value between 0 and m-1
    private int hashTextbook(Key key) 
@@ -91,16 +84,16 @@ public class LinearProbingHashST<Key, Value> {
    // resizes the hash table to the given capacity by re-hashing all of the keys
    private void resize(int capacity) 
    {
-       LinearProbingHashST<Key, Value> temp = new LinearProbingHashST<Key, Value>(capacity);
+       LinearProbingHashST<Key> temp = new LinearProbingHashST<Key>(capacity);
        for (int i = 0; i < m; i++) 
        {
            if (keys[i] != null) 
            {
-               temp.put(keys[i], vals[i]);
+               temp.put(keys[i], indexes[i]);
            }
        }
        keys = temp.keys;
-       vals = temp.vals;
+       indexes = temp.indexes;
        m    = temp.m;
    }
 
@@ -114,32 +107,35 @@ public class LinearProbingHashST<Key, Value> {
     * @param  val the value
     * @throws IllegalArgumentException if {@code key} is {@code null}
     */
-   public void put(Key key, Value val) 
+   public void put(Key key, int val) 
    {
        if (key == null) 
     	   throw new IllegalArgumentException("first argument to put() is null");
 
-       if (val == null) 
-       {
-           delete(key);
-           return;
-       }
+//       if (val == null) 
+//       {
+//           delete(key);
+//           return;
+//       }
 
        // double table size if 50% full
        if (n >= m/2) resize(2*m);
 
+       // if key is in array, replace value
        int i;
        for (i = hash(key); keys[i] != null; i = (i + 1) % m) 
        {
            if (keys[i].equals(key)) 
            {
-               vals[i] = val;
+               indexes[i] = val;
                return;
            }
        }
+       
+       //key is not in array, put key and index in their respective arrays
        keys[i] = key;
-       vals[i] = val;
-       n++;
+       indexes[i] = val;
+       ++n;
    }
 
    /**
@@ -149,17 +145,17 @@ public class LinearProbingHashST<Key, Value> {
     *         {@code null} if no such value
     * @throws IllegalArgumentException if {@code key} is {@code null}
     */
-   public Value get(Key key) 
+   public int get(Key key) 
    {
        if (key == null) 
     	   throw new IllegalArgumentException("argument to get() is null");
        for (int i = hash(key); keys[i] != null; i = (i + 1) % m)
        {
     	   if (keys[i].equals(key))
-               return vals[i];
+               return indexes[i];
        }
           
-       return null;
+       return -1;
    }
 
    /**
@@ -173,37 +169,37 @@ public class LinearProbingHashST<Key, Value> {
    {
        if (key == null) 
     	   throw new IllegalArgumentException("argument to delete() is null");
-       if (!contains(key)) return;
 
-       // find position i of key
-       int i = hash(key);
-       while (!key.equals(keys[i])) 
+       // find position i of key      
+       for (int i = hash(key); keys[i] != null; i = (i + 1) % m) 
        {
-           i = (i + 1) % m;
-       }
+           if (key.equals(keys[i]))
+           {
+        	   // delete key and associated value
+               keys[i] = null;
+               indexes[i] = 0;
+               
+               // rehash all keys in same cluster
+               i = (i + 1) % m;
+               while (keys[i] != null) 
+               {
+                   // delete keys[i] and vals[i] and reinsert
+                   Key   keyToRehash = keys[i];
+                   int valToRehash = indexes[i];
+                   keys[i] = null;
+                   indexes[i] = 0;
+                   --n;
+                   put(keyToRehash, valToRehash);
+                   i = (i + 1) % m;
+               }
 
-       // delete key and associated value
-       keys[i] = null;
-       vals[i] = null;
-
-       // rehash all keys in same cluster
-       i = (i + 1) % m;
-       while (keys[i] != null) 
-       {
-           // delete keys[i] and vals[i] and reinsert
-           Key   keyToRehash = keys[i];
-           Value valToRehash = vals[i];
-           keys[i] = null;
-           vals[i] = null;
-           n--;
-           put(keyToRehash, valToRehash);
-           i = (i + 1) % m;
-       }
-
-       n--;
-
-       // halves size of array if it's 12.5% full or less
-       if (n > 0 && n <= m/8) resize(m/2);
+               --n;
+               // halves size of array if it's 12.5% full or less
+               if (n > 0 && n <= m/8) resize(m/2);
+               
+               break;
+           	}
+       }       
    }
 }
 
