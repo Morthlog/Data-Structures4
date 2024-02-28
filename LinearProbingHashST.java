@@ -1,14 +1,13 @@
 
 
-
+//Parts from code by
 /*  @author Robert Sedgewick
 *  @author Kevin Wayne
 */
 public class LinearProbingHashST<Key> 
 {
-
    // must be a power of 2
-   private static final int INIT_CAPACITY = 4;
+   private static final int INIT_CAPACITY = 128;
 
    private int n;           // number of key-value pairs in the symbol table
    private int m;           // size of linear probing table
@@ -31,8 +30,7 @@ public class LinearProbingHashST<Key>
     */
    public LinearProbingHashST(int capacity)
    {
-       m = 2*nearestPowerOfTwo(capacity);
-//	   m=2*capacity;
+       m =2* nearestPowerOfTwo(capacity);
        n = 0;
        keys = (Key[]) new Object[m];
        indexes = new int[m];
@@ -65,13 +63,6 @@ public class LinearProbingHashST<Key>
        return size() == 0;
    }
 
-
-   // hash function for keys - returns value between 0 and m-1
-   private int hashTextbook(Key key) 
-   {
-       return (key.hashCode() & 0x7fffffff) % m;
-   }
-
    // hash function for keys - returns value between 0 and m-1 (assumes m is a power of 2)
    // (from Java 7 implementation, protects against poor quality hashCode() implementations)
    private int hash(Key key) 
@@ -81,21 +72,6 @@ public class LinearProbingHashST<Key>
        return h & (m-1);
    }
 
-   // resizes the hash table to the given capacity by re-hashing all of the keys
-   private void resize(int capacity) 
-   {
-       LinearProbingHashST<Key> temp = new LinearProbingHashST<Key>(capacity);
-       for (int i = 0; i < m; i++) 
-       {
-           if (keys[i] != null) 
-           {
-               temp.put(keys[i], indexes[i]);
-           }
-       }
-       keys = temp.keys;
-       indexes = temp.indexes;
-       m    = temp.m;
-   }
 
    /**
     * Inserts the specified key-value pair into the symbol table, overwriting the old
@@ -111,15 +87,6 @@ public class LinearProbingHashST<Key>
    {
        if (key == null) 
     	   throw new IllegalArgumentException("first argument to put() is null");
-
-//       if (val == null) 
-//       {
-//           delete(key);
-//           return;
-//       }
-
-       // double table size if 50% full
-       //if (n >= m/2) resize(2*m);
 
        // if key is in array, replace value
        int i;
@@ -177,7 +144,7 @@ public class LinearProbingHashST<Key>
            {
         	   // delete key and associated value
                keys[i] = null;
-               indexes[i] = 0;
+               indexes[i] = -1;
                
                // rehash all keys in same cluster
                i = (i + 1) % m;
@@ -187,16 +154,13 @@ public class LinearProbingHashST<Key>
                    Key keyToRehash = keys[i];
                    int valToRehash = indexes[i];
                    keys[i] = null;
-                   indexes[i] = 0;
+                   indexes[i] = -1;
                    --n;
                    put(keyToRehash, valToRehash);
                    i = (i + 1) % m;
                }
 
-               --n;
-               // halves size of array if it's 12.5% full or less
-               //if (n > 0 && n <= m/8) resize(m/2);
-               
+               --n;               
                break;
            	}
        }       

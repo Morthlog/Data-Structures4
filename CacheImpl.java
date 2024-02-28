@@ -131,11 +131,11 @@ public class CacheImpl<K, V> implements Cache<K, V> {
 	 */
 	public double getHitRatio()
     {
-		if(lookups>0)
-			return (double) hits/lookups;
-		else		
-			return 0;
-		
+		if(lookups>0L)		
+			return (double) hits/lookups;	
+			
+		else	
+			return 0;		
     }
 	
 	/**
