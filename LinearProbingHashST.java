@@ -13,7 +13,7 @@ public class LinearProbingHashST<Key>
    private int m;           // size of linear probing table
    private Key[] keys;      // the keys
    private int[] indexes;    // the values
-
+   int same;
 
    /**
     * Initializes an empty symbol table.
@@ -72,7 +72,11 @@ public class LinearProbingHashST<Key>
        return h & (m-1);
    }
 
-
+   private int hashTwo(Key key) 
+   {
+//	   return ((key.hashCode() & 0x7fffffff) % 97)+1;
+	   return (key.hashCode() & 0x7fffffff) % m;
+   }
    /**
     * Inserts the specified key-value pair into the symbol table, overwriting the old
     * value with the new value if the symbol table already contains the specified key.
@@ -90,7 +94,8 @@ public class LinearProbingHashST<Key>
 
        // if key is in array, replace value
        int i;
-       for (i = hash(key); keys[i] != null; i = (i + 1) % m) 
+       int k= hashTwo(key);
+       for (i = hash(key); keys[i] != null; i = (i + k) % m) 
        {
            if (keys[i].equals(key)) 
            {
@@ -116,7 +121,18 @@ public class LinearProbingHashST<Key>
    {
        if (key == null) 
     	   throw new IllegalArgumentException("argument to get() is null");
-       for (int i = hash(key); keys[i] != null; i = (i + 1) % m)
+       
+//       int one=hash(key);
+//       int two=hashTwo(key);
+//       if(one==two)
+//       {
+//    	   ++same;
+//    	   System.out.println("same "+same);
+//       }
+//    	   
+       int i;
+       int k= hashTwo(key);
+       for ( i = hash(key); keys[i] != null; i = (i + k) % m)
        {
     	   if (keys[i].equals(key))
                return indexes[i];

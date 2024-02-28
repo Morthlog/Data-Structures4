@@ -11,10 +11,10 @@ public class TestCacheSpeed {
 		Cache<String, String> cache = new CacheImpl<>(cachesize);		
 		
 		//give path to the dat file
-		String dataFile = "datasets/dataset-1000/data-1000.dat";
+		String dataFile = "datasets/dataset-5000/data-5000.dat";
 		
 		//give path to the workload file
-		String requestsFile = "datasets/dataset-1000/requests-10000.dat";
+		String requestsFile = "datasets/dataset-5000/requests-100000.dat";
 
 		DataSource dataSource = new DataSource(dataFile);
 		WorkloadReader requestReader = new WorkloadReader(requestsFile);
@@ -28,7 +28,7 @@ public class TestCacheSpeed {
 		long startTime = System.currentTimeMillis();
 		
 		while ((key = requestReader.nextRequest()) != null) {
-			System.out.println("requests " + numberOfRequests++);
+			//System.out.println("requests " + numberOfRequests++);
 			String data = (String)cache.lookUp(key);
 			if (data == null) {//data not in cache
 				data = dataSource.readItem(key);
