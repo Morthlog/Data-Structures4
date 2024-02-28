@@ -6,9 +6,11 @@ public class CacheImpl<K, V> implements Cache<K, V> {
 
     protected Node<K, V>[] cachedData;
     //* HashMap
-    protected HashMap<K, Integer> dataPointer = new HashMap<K, Integer>();
+    protected LinearProbingHashST<K, Integer> dataPointer ;
     int size = 0, sizeMax;
     Node<K, V> first = null, last = null;
+    int misses = 0, hits=0, lookups=0;
+  
     CacheImpl()
     {
         sizeMax = 100;
@@ -19,6 +21,7 @@ public class CacheImpl<K, V> implements Cache<K, V> {
     {
         this.sizeMax = size;
         cachedData = new Node[sizeMax];
+        dataPointer = new LinearProbingHashST<K, Integer>(sizeMax);
     }
 
 /**
@@ -28,16 +31,18 @@ public class CacheImpl<K, V> implements Cache<K, V> {
 	 */
 	public V lookUp(K key)
     {
-        int hashedKey = hash(key);
+		lookups++;
         int index = 0;
         //! search in HashMap for key and return the node's data
-        index = dataPointer.search(hashedKey);
+        index = dataPointer.get(key);
         if (index == -1)
         {
+        	misses++;
             return null;
         }
         else
         {
+        	hits++;
             if (cachedData[index] == last)
             {
                 first.next = last;
@@ -91,11 +96,9 @@ public class CacheImpl<K, V> implements Cache<K, V> {
             first = first.next;
             
             //! add to hashMap which points to index of lastKey
-
-            //! delete lastKey from hashMap
-            dataPointer.remove(lastKey);         
             
-             
+            //! delete lastKey from hashMap
+            dataPointer.delete(key);           
         }
         else
         {
@@ -113,7 +116,7 @@ public class CacheImpl<K, V> implements Cache<K, V> {
             }
 
             //! add to hashMap which points to size
-
+            
             ++size;
         }
     }
@@ -124,7 +127,11 @@ public class CacheImpl<K, V> implements Cache<K, V> {
 	 */
 	public double getHitRatio()
     {
-        return -1;
+		if(lookups>0)
+			return hits/lookups;
+		else		
+			return 0;
+		
     }
 	
 	/**
@@ -132,7 +139,7 @@ public class CacheImpl<K, V> implements Cache<K, V> {
 	 */
 	public long getHits()
     {
-        return -1;
+        return hits;
     }
 	
 	/**
@@ -140,7 +147,7 @@ public class CacheImpl<K, V> implements Cache<K, V> {
 	 */
 	public long getMisses()
     {
-        return -1;
+        return misses;
     }
 	
 	/**
@@ -148,12 +155,9 @@ public class CacheImpl<K, V> implements Cache<K, V> {
 	 */
 	public long getNumberOfLookUps()
     {
-        return -1;
+        return lookups;
     }
 	
-	int hash(K key)
-	{
-		return (key.hashCode() & 0x7fffffff) % size; //hashCode may returen negative number. Make it positive
-	}
+	
 	
 }
