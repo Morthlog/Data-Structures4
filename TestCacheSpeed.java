@@ -5,7 +5,11 @@ import java.io.IOException;
 public class TestCacheSpeed {
 
 	public static void main(String[] args) throws IOException {
-		
+		//for easier testing
+	int j = 0;
+	long[] each = new long[10]; 
+	while(j<10)
+	{	
 		int cachesize = 100;
 		//initialize with your cache implementation		
 		Cache<String, String> cache = new CacheImpl<>(cachesize);		
@@ -42,10 +46,15 @@ public class TestCacheSpeed {
 
 		/*speed test finished*/
 		long duration = System.currentTimeMillis() - startTime;
-		
 		System.out.printf("Read %d items in %d ms\n", numberOfRequests,	duration);
 		System.out.printf("Stats: lookups %d, hits %d, hit-ratio %f\n", cache.getNumberOfLookUps(), cache.getHits(), cache.getHitRatio());
 
 		requestReader.close();
+		each[j]=duration;++j;
+	}
+		for (long pop:each)
+		{
+			System.out.println(pop);
+		}
 	}
 }

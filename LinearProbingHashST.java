@@ -32,7 +32,7 @@ public class LinearProbingHashST<Key>
    {
        m =2* nearestPowerOfTwo(capacity);
        n = 0;
-       keys = (Key[])   new Object[m];
+       keys = (Key[]) new Object[m];
        indexes = new int[m];
    }
 
@@ -167,7 +167,7 @@ public class LinearProbingHashST<Key>
                while (keys[i] != null) 
                {
                    // delete keys[i] and vals[i] and reinsert
-                   Key   keyToRehash = keys[i];
+                   Key keyToRehash = keys[i];
                    int valToRehash = indexes[i];
                    keys[i] = null;
                    indexes[i] = -1;
