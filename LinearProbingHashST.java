@@ -34,7 +34,7 @@ public class LinearProbingHashST<Key>
        m = 2*nearestPowerOfTwo(capacity);
 //	   m=2*capacity;
        n = 0;
-       keys = (Key[])   new Object[m];
+       keys = (Key[]) new Object[m];
        indexes = new int[m];
    }
 
@@ -119,7 +119,7 @@ public class LinearProbingHashST<Key>
 //       }
 
        // double table size if 50% full
-       if (n >= m/2) resize(2*m);
+       //if (n >= m/2) resize(2*m);
 
        // if key is in array, replace value
        int i;
@@ -184,7 +184,7 @@ public class LinearProbingHashST<Key>
                while (keys[i] != null) 
                {
                    // delete keys[i] and vals[i] and reinsert
-                   Key   keyToRehash = keys[i];
+                   Key keyToRehash = keys[i];
                    int valToRehash = indexes[i];
                    keys[i] = null;
                    indexes[i] = 0;
@@ -195,7 +195,7 @@ public class LinearProbingHashST<Key>
 
                --n;
                // halves size of array if it's 12.5% full or less
-               if (n > 0 && n <= m/8) resize(m/2);
+               //if (n > 0 && n <= m/8) resize(m/2);
                
                break;
            	}

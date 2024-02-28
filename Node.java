@@ -1,4 +1,3 @@
-
 /**
  * ListNode represents a list node
  * Each node contains a generic type T as data and a reference to the next node in the list.
@@ -7,8 +6,8 @@ public class Node<KEY, DATA>
 {
 	protected KEY key ;
     protected DATA data;
-    protected int next = -1;
-    protected int prev = -1;
+    protected Node<KEY, DATA> next = null;
+    protected Node<KEY, DATA> prev = null;
 
     /**
      * Constructor. Sets data
@@ -43,13 +42,13 @@ public class Node<KEY, DATA>
      *
      * @return the next node
      */
-    public int getNext() 
+    public Node<KEY, DATA> getNext() 
     {
         // get next node
         return next;
     }
 
-    public int getPrev() 
+    public Node<KEY, DATA> getPrev() 
     {
         // get next node
         return prev;
@@ -60,7 +59,7 @@ public class Node<KEY, DATA>
      *
      * @param next reference
      */
-    public void setNext(int next) 
+    public void setNext(Node<KEY, DATA> next) 
     {
         this.next = next;
     }
@@ -71,10 +70,8 @@ public class Node<KEY, DATA>
      *
      * @param prev reference
      */
-    public void setPrev(int prev) 
+    public void setPrev(Node<KEY, DATA> prev) 
     {
         this.prev = prev;
     }
 }
-
-
