@@ -177,7 +177,7 @@ public class LinearProbingHashST<Key>
            {
         	   // delete key and associated value
                keys[i] = null;
-               indexes[i] = 0;
+               indexes[i] = -1;
                
                // rehash all keys in same cluster
                i = (i + 1) % m;
@@ -187,7 +187,7 @@ public class LinearProbingHashST<Key>
                    Key   keyToRehash = keys[i];
                    int valToRehash = indexes[i];
                    keys[i] = null;
-                   indexes[i] = 0;
+                   indexes[i] = -1;
                    --n;
                    put(keyToRehash, valToRehash);
                    i = (i + 1) % m;
