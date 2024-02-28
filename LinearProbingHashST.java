@@ -4,7 +4,7 @@
 /*  @author Robert Sedgewick
 *  @author Kevin Wayne
 */
-public class LinearProbingHashST<Key, Value> 
+public class LinearProbingHashST<Key> 
 {
 
    // must be a power of 2
@@ -13,7 +13,7 @@ public class LinearProbingHashST<Key, Value>
    private int n;           // number of key-value pairs in the symbol table
    private int m;           // size of linear probing table
    private Key[] keys;      // the keys
-   private Value[] vals;    // the values
+   private int[] indexes;    // the values
 
 
    /**
@@ -34,7 +34,7 @@ public class LinearProbingHashST<Key, Value>
        m = nearestPowerOfTwo(capacity);
        n = 0;
        keys = (Key[])   new Object[m];
-       vals = (Value[]) new Object[m];
+       indexes = new int[m];
    }
 
    int nearestPowerOfTwo(int capacity)
@@ -83,16 +83,16 @@ public class LinearProbingHashST<Key, Value>
    // resizes the hash table to the given capacity by re-hashing all of the keys
    private void resize(int capacity) 
    {
-       LinearProbingHashST<Key, Value> temp = new LinearProbingHashST<Key, Value>(capacity);
+       LinearProbingHashST<Key> temp = new LinearProbingHashST<Key>(capacity);
        for (int i = 0; i < m; i++) 
        {
            if (keys[i] != null) 
            {
-               temp.put(keys[i], vals[i]);
+               temp.put(keys[i], indexes[i]);
            }
        }
        keys = temp.keys;
-       vals = temp.vals;
+       indexes = temp.indexes;
        m    = temp.m;
    }
 
@@ -106,31 +106,34 @@ public class LinearProbingHashST<Key, Value>
     * @param  val the value
     * @throws IllegalArgumentException if {@code key} is {@code null}
     */
-   public void put(Key key, Value val) 
+   public void put(Key key, int val) 
    {
        if (key == null) 
     	   throw new IllegalArgumentException("first argument to put() is null");
 
-       if (val == null) 
-       {
-           delete(key);
-           return;
-       }
+//       if (val == null) 
+//       {
+//           delete(key);
+//           return;
+//       }
 
        // double table size if 50% full
        if (n >= m/2) resize(2*m);
 
+       // if key is in array, replace value
        int i;
        for (i = hash(key); keys[i] != null; i = (i + 1) % m) 
        {
            if (keys[i].equals(key)) 
            {
-               vals[i] = val;
+               indexes[i] = val;
                return;
            }
        }
+       
+       //key is not in array, put key and index in their respective arrays
        keys[i] = key;
-       vals[i] = val;
+       indexes[i] = val;
        ++n;
    }
 
@@ -141,17 +144,17 @@ public class LinearProbingHashST<Key, Value>
     *         {@code null} if no such value
     * @throws IllegalArgumentException if {@code key} is {@code null}
     */
-   public Value get(Key key) 
+   public int get(Key key) 
    {
        if (key == null) 
     	   throw new IllegalArgumentException("argument to get() is null");
        for (int i = hash(key); keys[i] != null; i = (i + 1) % m)
        {
     	   if (keys[i].equals(key))
-               return vals[i];
+               return indexes[i];
        }
           
-       return null;
+       return -1;
    }
 
    /**
@@ -173,7 +176,7 @@ public class LinearProbingHashST<Key, Value>
            {
         	   // delete key and associated value
                keys[i] = null;
-               vals[i] = null;
+               indexes[i] = 0;
                
                // rehash all keys in same cluster
                i = (i + 1) % m;
@@ -181,9 +184,9 @@ public class LinearProbingHashST<Key, Value>
                {
                    // delete keys[i] and vals[i] and reinsert
                    Key   keyToRehash = keys[i];
-                   Value valToRehash = vals[i];
+                   int valToRehash = indexes[i];
                    keys[i] = null;
-                   vals[i] = null;
+                   indexes[i] = 0;
                    --n;
                    put(keyToRehash, valToRehash);
                    i = (i + 1) % m;
