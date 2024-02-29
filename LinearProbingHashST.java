@@ -13,7 +13,7 @@ public class LinearProbingHashST<Key>
    private int m;           // size of linear probing table
    private Key[] keys;      // the keys
    private int[] indexes;    // the values
-   int same;
+   int primeSize;
 
    /**
     * Initializes an empty symbol table.
@@ -31,9 +31,13 @@ public class LinearProbingHashST<Key>
    public LinearProbingHashST(int capacity)
    {
        m =2* nearestPowerOfTwo(capacity);
+       //m=211;
        n = 0;
        keys = (Key[]) new Object[m];
        indexes = new int[m];
+       
+       primeSize=getPrime();
+       
    }
 
    int nearestPowerOfTwo(int capacity)
@@ -63,6 +67,21 @@ public class LinearProbingHashST<Key>
        return size() == 0;
    }
 
+   /* Function to get prime number less than table size for myhash2 function */  
+   public int getPrime()  
+   {  
+       for (int i = m - 1; i >= 1; i--)  
+           {  
+               int fact = 0;  
+               for (int j = 2; j <= (int) Math.sqrt(i); j++)  
+                   if (i % j == 0)  
+                       fact++;  
+               if (fact == 0)  
+                   return i;  
+           }  
+      /* Return a prime number */  
+       return 3;  
+   }
    // hash function for keys - returns value between 0 and m-1 (assumes m is a power of 2)
    // (from Java 7 implementation, protects against poor quality hashCode() implementations)
    private int hash(Key key) 
@@ -70,12 +89,14 @@ public class LinearProbingHashST<Key>
        int h = key.hashCode();
        h ^= (h >>> 20) ^ (h >>> 12) ^ (h >>> 7) ^ (h >>> 4);
        return h & (m-1);
+	   
+//	   return (key.hashCode() & 0x7fffffff)%(m-1);
    }
 
    private int hashTwo(Key key) 
    {
-//	   return ((key.hashCode() & 0x7fffffff) % 97)+1;
-	   return (key.hashCode() & 0x7fffffff) % m;
+	   int hash2=(key.hashCode() & 0x7fffffff);
+	   return primeSize-(hash2 % primeSize) ;
    }
    /**
     * Inserts the specified key-value pair into the symbol table, overwriting the old
@@ -92,15 +113,27 @@ public class LinearProbingHashST<Key>
        if (key == null) 
     	   throw new IllegalArgumentException("first argument to put() is null");
 
-       // if key is in array, replace value
+      
        int i;
        int k= hashTwo(key);
+       int initialPos = hash(key);
        for (i = hash(key); keys[i] != null; i = (i + k) % m) 
        {
+    	   System.out.println("put "+" key= "+key+" i="+ i +" k="+k);
+    	   // if key is in array, replace value
            if (keys[i].equals(key)) 
            {
                indexes[i] = val;
                return;
+           }
+           //found sentinel, same as empty space
+           if( indexes[i]==-2)
+        	   break;
+           if(initialPos==i)
+           {
+        	   //looping
+        	   System.out.println("looping "+ "N="+n+" m= "+m);
+        	   
            }
        }
        
@@ -121,26 +154,41 @@ public class LinearProbingHashST<Key>
    {
        if (key == null) 
     	   throw new IllegalArgumentException("argument to get() is null");
-       
-//       int one=hash(key);
-//       int two=hashTwo(key);
-//       if(one==two)
-//       {
-//    	   ++same;
-//    	   System.out.println("same "+same);
-//       }
-//    	   
+
        int i;
        int k= hashTwo(key);
-       for ( i = hash(key); keys[i] != null; i = (i + k) % m)
-       {
-    	   if (keys[i].equals(key))
+    
+       int initial = hash(key);
+       for ( i = hash(key); keys[i] != null ; i = (i + k) % m)
+       {   
+    	   System.out.println("get "+" key= "+key+" i="+ i +" k="+k);     
+    	   if (keys[i].equals(key) &&  indexes[i] != -2)
                return indexes[i];
+    	   if(i==initial)
+    	   {
+    		   System.out.println("looping "+ initial);
+    		   break;
+    	   }
+    		 
        }
           
        return -1;
    }
 
+   private void resize(int capacity) 
+   {
+       LinearProbingHashST<Key> temp = new LinearProbingHashST<Key>(capacity);
+       for (int i = 0; i < m; i++) 
+       {
+           if (keys[i] != null) 
+           {
+               temp.put(keys[i], indexes[i]);
+           }
+       }
+       keys = temp.keys;
+       indexes = temp.indexes;
+       m    = temp.m;
+   }
    /**
     * Removes the specified key and its associated value from this symbol table
     * (if the key is in this symbol table).
@@ -153,28 +201,31 @@ public class LinearProbingHashST<Key>
        if (key == null) 
     	   throw new IllegalArgumentException("argument to delete() is null");
 
-       // find position i of key      
-       for (int i = hash(key); keys[i] != null; i = (i + 1) % m) 
-       {
-           if (key.equals(keys[i]))
+       // find position i of key 
+       int k= hashTwo(key);
+
+       for (int i = hash(key); keys[i] != null && indexes[i] != -2; i = (i +k) % m) 
+       { 
+    	   System.out.println("delete "+" key= "+key+" i="+ i +" k="+k);     
+           if (key.equals(keys[i]) )
            {
         	   // delete key and associated value
-               keys[i] = null;
-               indexes[i] = -1;
-               
-               // rehash all keys in same cluster
-               i = (i + 1) % m;
-               while (keys[i] != null) 
-               {
-                   // delete keys[i] and vals[i] and reinsert
-                   Key keyToRehash = keys[i];
-                   int valToRehash = indexes[i];
-                   keys[i] = null;
-                   indexes[i] = -1;
-                   --n;
-                   put(keyToRehash, valToRehash);
-                   i = (i + 1) % m;
-               }
+//               keys[i] = null;
+               indexes[i] = -2;
+//               
+//               // rehash all keys in same cluster
+//               i = (i + 1) % m;
+//               while (keys[i] != null) 
+//               {
+//                   // delete keys[i] and vals[i] and reinsert
+//                   Key keyToRehash = keys[i];
+//                   int valToRehash = indexes[i];
+//                   keys[i] = null;
+//                   indexes[i] = -1;
+//                   --n;
+//                   put(keyToRehash, valToRehash);
+//                   i = (i + 1) % m;
+//               }
 
                --n;               
                break;
