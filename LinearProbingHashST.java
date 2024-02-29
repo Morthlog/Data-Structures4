@@ -133,7 +133,7 @@ public class LinearProbingHashST<Key>
            {
         	   //looping
         	   System.out.println("looping "+ "N="+n+" m= "+m);
-        	   
+        	   resize(2*m);
            }
        }
        
@@ -204,7 +204,7 @@ public class LinearProbingHashST<Key>
        // find position i of key 
        int k= hashTwo(key);
 
-       for (int i = hash(key); keys[i] != null && indexes[i] != -2; i = (i +k) % m) 
+       for (int i = hash(key); keys[i] != null; i = (i +k) % m) 
        { 
     	   System.out.println("delete "+" key= "+key+" i="+ i +" k="+k);     
            if (key.equals(keys[i]) )
