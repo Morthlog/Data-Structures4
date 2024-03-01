@@ -6,14 +6,15 @@ import java.io.IOException;
 // CacheImpl3: Nodes save Node index, hashmap saves index
 // CacheImpl5: Nodes save Node index, hashmap saves Node ref
 // CacheImpl4: Double Hashing, Nodes save Node ref, hashmap saves index
+// CacheImpl6: Double Hashing, Nodes save Node index, hashmap saves Node ref
 
 public class TestCacheSpeed {
 
 	public static void main(String[] args) throws IOException {
 		//?for easier testing
 	int j = 0;
-	int testCount=5; //* number of different implementations
-	int maxLoops=10*testCount;
+	int testCount=6; //* number of different implementations
+	int maxLoops=2*testCount;
 	long[] each = new long[maxLoops];
 	long[] average = new long[testCount];
 	Cache<String, String> cache = new CacheImpl<>(0);
@@ -23,7 +24,9 @@ public class TestCacheSpeed {
 	"Nodes save Node ref, hashmap saves Node ref: ",
 	"Nodes save Node index, hashmap saves index: ",
 	"Nodes save Node index, hashmap saves Node ref: ",
-	"Double Hashing, Nodes save Node ref, hashmap saves index: "};
+	"Double Hashing, Nodes save Node ref, hashmap saves index: ",
+	"Double Hashing, Nodes save Node index, hashmap saves Node ref: ",
+	};
 
 	
 	while(j<maxLoops+1) // used to replace first iteration
@@ -40,6 +43,8 @@ public class TestCacheSpeed {
 			cache = new CacheImpl5<>(cachesize);//Nodes save Node index, hashmap saves Node ref
 		else if (j%testCount==4)		
 			cache = new CacheImpl4<>(cachesize);//Double Hashing, Nodes save Node ref, hashmap saves index
+		else if (j%testCount==5)		
+			cache = new CacheImpl6<>(cachesize);//Double Hashing, Nodes save Node index, hashmap saves Node ref
 		//give path to the dat file
 		String dataFile = "datasets/dataset-1000/data-1000.dat";
 		

@@ -2,28 +2,28 @@
 //? Nodes will know the index for prev and next, instead of having a copy of the nodes
 //? Nodes will require info of their own index
 
-public class CacheImpl4<K, V> implements Cache<K, V> {
+public class CacheImpl6<K, V> implements Cache<K, V> {
 
-    protected Node<K, V>[] cachedData;
+    protected Node2<K,V>[] cachedData;
     //* HashMap
-    protected LinearProbingHashStDouble<K> dataPointer ;
+    protected LinearProbingHashStDouble2<K,V> dataPointer ;
     int size = 0, sizeMax;
-    Node<K, V> first = null, last = null;
+    int first = -1, last = -1;
     long misses = 0, hits=0, lookups=0;
   
     @SuppressWarnings("unchecked")
-    CacheImpl4()
+    CacheImpl6()
     {
         sizeMax = 100;
-        cachedData = new Node[sizeMax];
+        cachedData = new Node2[sizeMax];
     }
 
     @SuppressWarnings("unchecked")
-    CacheImpl4(int size)
+    CacheImpl6(int size)
     {
         this.sizeMax = size;
-        cachedData = new Node[sizeMax];
-        dataPointer = new LinearProbingHashStDouble<K>(sizeMax);
+        cachedData = new Node2[sizeMax];
+        dataPointer = new LinearProbingHashStDouble2<K,V>(sizeMax);
     }
 
 /**
@@ -34,10 +34,10 @@ public class CacheImpl4<K, V> implements Cache<K, V> {
 	public V lookUp(K key)
     {
 		lookups++;
-        int index = 0;
+        Node2<K,V> index;
         //! search in HashMap for key and return the node's data
         index = dataPointer.get(key);
-        if (index == -1)
+        if (index == null)
         {
         	misses++;
             return null;
@@ -45,29 +45,29 @@ public class CacheImpl4<K, V> implements Cache<K, V> {
         else
         {
         	hits++;
-            if (cachedData[index] == last)
+            if (index == cachedData[last])
             {
-                first.next = last;
-                last = last.next;
+                cachedData[first].next = last;
+                last = cachedData[last].next;
                 
-                last.prev = null;
-                first.next.next = null;
+                cachedData[last].prev = -1;
+                cachedData[cachedData[first].next].next = -1;
                 
-                first.next.prev = first;
-                first = first.next;
+                cachedData[cachedData[first].next].prev = first;
+                first = cachedData[first].next;
             }
-            else if (cachedData[index] != first) // no position update needed
+            else if (index != cachedData[first]) // no position update needed
             {
-                cachedData[index].prev.next = cachedData[index].next;
-                cachedData[index].next.prev = cachedData[index].prev;
+                cachedData[index.prev].next = index.next;
+                cachedData[index.next].prev = index.prev;
 
-                first.next = cachedData[index];
-                cachedData[index].prev = first;
-                cachedData[index].next = null;
-                first = cachedData[index];
+                cachedData[first].next = index.pos;
+                index.prev = first;
+                index.next = -1;
+                first = index.pos;
             }
 
-            return cachedData[index].getData();
+            return index.getData();
         }
     }
 	
@@ -81,46 +81,47 @@ public class CacheImpl4<K, V> implements Cache<K, V> {
     {
         if (sizeMax<=size)
         {
-            K lastKey = last.getKey();
-            int ind = dataPointer.get(lastKey);
-            first.next = last;
+            K lastKey = cachedData[last].getKey();
+            int lastpos = cachedData[last].pos;
+            cachedData[first].next = last;
             // replace data of last with new data
-            last.data = value;
-            last.key = key;
-            last.prev = first;
+            cachedData[last].data = value;
+            cachedData[last].key = key;
+            cachedData[last].prev = first;
 
             // remove connection between last and second from last
-            last = last.next;
-            last.prev.next = null;
-            last.prev = null;
+            last = cachedData[last].next;
+            cachedData[cachedData[last].prev].next = -1;
+            cachedData[last].prev = -1;
 
             // finish movement of last to the start
-            first.next.prev = first;
-            first = first.next;
+            cachedData[cachedData[first].next].prev = first;
+            first = cachedData[first].next;
             
             //! delete lastKey from hashMap
             dataPointer.delete(lastKey);   
 
             //! add to hashMap which points to index of lastKey, which is now first
-            dataPointer.put(key, ind);
+            dataPointer.put(key, cachedData[first]);
+            cachedData[lastpos].pos = first;
         }
         else
         {
-            cachedData[size] = new Node<K, V>(key, value);
+            cachedData[size] = new Node2<K, V>(key, value);
             if (size == 0)
             {
-                first = cachedData[size];
-                last = first;
+                first = size;
+                last = first;  
             }
             else
             {
                 cachedData[size].prev = first;
-                first.next = cachedData[size];
-                first = cachedData[size];
+                cachedData[first].next = size;
+                first = size;
             }
-
+            cachedData[size].pos = first;
             //! add to hashMap which points to first
-            dataPointer.put(key, size);
+            dataPointer.put(key, cachedData[first]);
             ++size;
         }
     }
