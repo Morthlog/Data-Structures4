@@ -6,7 +6,7 @@ public class CacheImpl<K, V> implements Cache<K, V> {
 
     protected Node<K, V>[] cachedData;
     //* HashMap
-    protected DoubleHashing<K> dataPointer ;
+    protected SeperateChaining<K> dataPointer ;
     int size = 0, sizeMax;
     Node<K, V> first = null, last = null;
     long misses = 0, hits=0, lookups=0;
@@ -23,7 +23,7 @@ public class CacheImpl<K, V> implements Cache<K, V> {
     {
         this.sizeMax = size;
         cachedData = new Node[sizeMax];
-        dataPointer = new DoubleHashing<K>(sizeMax);
+        dataPointer = new SeperateChaining<K>(sizeMax);
     }
 
 /**

@@ -22,28 +22,31 @@ public class TestCacheSpeed {
 		long numberOfRequests = 0;
 		
 		/*start performance test*/
-		
-		//track current time
-		long startTime = System.currentTimeMillis();
-		
-		while ((key = requestReader.nextRequest()) != null) {
-			System.out.println("requests " + numberOfRequests++);
-			String data = (String)cache.lookUp(key);
-			if (data == null) {//data not in cache
-				data = dataSource.readItem(key);
-				if (data == null) {
-					throw new IllegalArgumentException("DID NOT FIND DATA WITH KEY " + key +". Have you set up files properly?");
-				}else{
-					cache.store(key, data);
-				}
-			}			
-		}
+		for	(int i=0;i<2;i++)
+		{
+			//track current time
+			long startTime = System.currentTimeMillis();
+			
+			while ((key = requestReader.nextRequest()) != null) {
+				System.out.println("requests " + numberOfRequests++);
+				String data = (String)cache.lookUp(key);
+				if (data == null) {//data not in cache
+					data = dataSource.readItem(key);
+					if (data == null) {
+						throw new IllegalArgumentException("DID NOT FIND DATA WITH KEY " + key +". Have you set up files properly?");
+					}else{
+						cache.store(key, data);
+					}
+				}			
+			}
 
-		/*speed test finished*/
-		long duration = System.currentTimeMillis() - startTime;
+			/*speed test finished*/
+			long duration = System.currentTimeMillis() - startTime;
+			
+			System.out.printf("Read %d items in %d ms\n", numberOfRequests,	duration);
+			System.out.printf("Stats: lookups %d, hits %d, hit-ratio %f\n", cache.getNumberOfLookUps(), cache.getHits(), cache.getHitRatio());
+		}
 		
-		System.out.printf("Read %d items in %d ms\n", numberOfRequests,	duration);
-		System.out.printf("Stats: lookups %d, hits %d, hit-ratio %f\n", cache.getNumberOfLookUps(), cache.getHits(), cache.getHitRatio());
 
 		requestReader.close();
 	}
