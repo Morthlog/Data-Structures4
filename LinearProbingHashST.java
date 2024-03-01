@@ -30,14 +30,16 @@ public class LinearProbingHashST<Key>
     */
    public LinearProbingHashST(int capacity)
    {
-       m =2* nearestPowerOfTwo(capacity);
+       //m =2* nearestPowerOfTwo(capacity) ;
+        m = closestPrime((int) (capacity/0.7));
        //m=211;
+
        n = 0;
        keys = (Key[]) new Object[m];
        indexes = new int[m];
        
-       primeSize=getPrime();
-       
+       primeSize = closestPrime(m);
+        n=0;
    }
 
    int nearestPowerOfTwo(int capacity)
@@ -68,9 +70,9 @@ public class LinearProbingHashST<Key>
    }
 
    /* Function to get prime number less than table size for myhash2 function */  
-   public int getPrime()  
+   public int closestPrime(int upper_bound)  
    {  
-       for (int i = m - 1; i >= 1; i--)  
+       for (int i = upper_bound - 1; i >= 1; i--)  
            {  
                int fact = 0;  
                for (int j = 2; j <= (int) Math.sqrt(i); j++)  
@@ -86,17 +88,23 @@ public class LinearProbingHashST<Key>
    // (from Java 7 implementation, protects against poor quality hashCode() implementations)
    private int hash(Key key) 
    {
+    //! ===================================================================================================================
+    //! test and pick best hash
        int h = key.hashCode();
-       h ^= (h >>> 20) ^ (h >>> 12) ^ (h >>> 7) ^ (h >>> 4);
-       return h & (m-1);
+    //   h ^= (h >>> 20) ^ (h >>> 12) ^ (h >>> 7) ^ (h >>> 4);
+    //   return h & (m-1);
+    int k =h%m;
+        return k;
 	   
 //	   return (key.hashCode() & 0x7fffffff)%(m-1);
    }
 
    private int hashTwo(Key key) 
    {
-	   int hash2=(key.hashCode() & 0x7fffffff);
-	   return primeSize-(hash2 % primeSize) ;
+    //! test and pick best hash
+	   int hash2=(key.hashCode()); // & 0x7fffffff);
+	   int k = primeSize-(hash2 % primeSize) ;
+       return k;
    }
    /**
     * Inserts the specified key-value pair into the symbol table, overwriting the old
@@ -117,9 +125,13 @@ public class LinearProbingHashST<Key>
        int i;
        int k= hashTwo(key);
        int initialPos = hash(key);
+       //! ===================================================================================================================
+       //! ignore first initial is kind of sloopy, kindly do better
+       int temp =0;
        for (i = hash(key); keys[i] != null; i = (i + k) % m) 
        {
-    	   System.out.println("put "+" key= "+key+" i="+ i +" k="+k);
+            if (i== initialPos) ++temp;
+//    	   System.out.println("put "+" key= "+key+" i="+ i +" k="+k);
     	   // if key is in array, replace value
            if (keys[i].equals(key)) 
            {
@@ -129,11 +141,11 @@ public class LinearProbingHashST<Key>
            //found sentinel, same as empty space
            if( indexes[i]==-2)
         	   break;
-           if(initialPos==i)
+           if(initialPos==i & temp == 2)
            {
         	   //looping
         	   System.out.println("looping "+ "N="+n+" m= "+m);
-        	   resize(2*m);
+    //    	   resize(2*m);
            }
        }
        
@@ -157,19 +169,21 @@ public class LinearProbingHashST<Key>
 
        int i;
        int k= hashTwo(key);
-    
+        //! ===================================================================================================================
+       //! ignore first initial is kind of sloopy, kindly do better
        int initial = hash(key);
+       int temp = 0;
        for ( i = hash(key); keys[i] != null ; i = (i + k) % m)
        {   
-    	   System.out.println("get "+" key= "+key+" i="+ i +" k="+k);     
+            if (i== initial) ++temp; 
+    	//   System.out.println("get "+" key= "+key+" i="+ i +" k="+k);     
     	   if (keys[i].equals(key) &&  indexes[i] != -2)
                return indexes[i];
-    	   if(i==initial)
+    	   if(i==initial & temp==2)
     	   {
-    		   System.out.println("looping "+ initial);
+    		   //System.out.println("looping "+ initial);
     		   break;
-    	   }
-    		 
+    	   } 
        }
           
        return -1;
@@ -206,8 +220,8 @@ public class LinearProbingHashST<Key>
 
        for (int i = hash(key); keys[i] != null; i = (i +k) % m) 
        { 
-    	   System.out.println("delete "+" key= "+key+" i="+ i +" k="+k);     
-           if (key.equals(keys[i]) )
+    	   //System.out.println("delete "+" key= "+key+" i="+ i +" k="+k);     
+           if (key.equals(keys[i]) && indexes[i] != -2 )
            {
         	   // delete key and associated value
 //               keys[i] = null;
