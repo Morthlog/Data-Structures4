@@ -1,10 +1,8 @@
-
-
 //Parts from code by
 /*  @author Robert Sedgewick
 *  @author Kevin Wayne
 */
-public class LinearProbingHashST<Key> 
+public class LinearProbingHashST2<Key,V> 
 {
    // must be a power of 2
    private static final int INIT_CAPACITY = 128;
@@ -12,13 +10,13 @@ public class LinearProbingHashST<Key>
    private int n;           // number of key-value pairs in the symbol table
    private int m;           // size of linear probing table
    private Key[] keys;      // the keys
-   private int[] indexes;    // the values
+   private Node<Key,V>[] indexes;    // the values
 
 
    /**
     * Initializes an empty symbol table.
     */
-   public LinearProbingHashST() 
+   public LinearProbingHashST2() 
    {
        this(INIT_CAPACITY);
    }
@@ -28,19 +26,12 @@ public class LinearProbingHashST<Key>
     *
     * @param capacity the initial capacity
     */
-   public LinearProbingHashST(int capacity)
+   public LinearProbingHashST2(int capacity)
    {
-       m =closestPrime((int)(capacity/0.7));
+       m = closestPrime((int) (capacity/0.7));
        n = 0;
        keys = (Key[]) new Object[m];
-       indexes = new int[m];
-   }
-
-   int nearestPowerOfTwo(int capacity)
-   {
-	   int nearestPower;
-	   for(nearestPower = 2; nearestPower < capacity; nearestPower *= 2) {} 
-	   return nearestPower;
+       indexes = new Node[m];
    }
 
    public int closestPrime(int upper_bound)  
@@ -56,6 +47,13 @@ public class LinearProbingHashST<Key>
            }  
       /* Return a prime number */  
        return 3;  
+   }
+
+   int nearestPowerOfTwo(int capacity)
+   {
+	   int nearestPower;
+	   for(nearestPower = 2; nearestPower < capacity; nearestPower *= 2) {} 
+	   return nearestPower;
    }
    /**
     * Returns the number of key-value pairs in this symbol table.
@@ -98,7 +96,7 @@ public class LinearProbingHashST<Key>
     * @param  val the value
     * @throws IllegalArgumentException if {@code key} is {@code null}
     */
-   public void put(Key key, int val) 
+   public void put(Key key, Node<Key,V> val) 
    {
        if (key == null) 
     	   throw new IllegalArgumentException("first argument to put() is null");
@@ -127,7 +125,7 @@ public class LinearProbingHashST<Key>
     *         {@code null} if no such value
     * @throws IllegalArgumentException if {@code key} is {@code null}
     */
-   public int get(Key key) 
+   public Node<Key,V> get(Key key) 
    {
        if (key == null) 
     	   throw new IllegalArgumentException("argument to get() is null");
@@ -137,7 +135,7 @@ public class LinearProbingHashST<Key>
                return indexes[i];
        }
           
-       return -1;
+       return null;
    }
 
    /**
@@ -159,7 +157,7 @@ public class LinearProbingHashST<Key>
            {
         	   // delete key and associated value
                keys[i] = null;
-               indexes[i] = -1;
+               indexes[i] = null;
                
                // rehash all keys in same cluster
                i = (i + 1) % m;
@@ -167,9 +165,9 @@ public class LinearProbingHashST<Key>
                {
                    // delete keys[i] and vals[i] and reinsert
                    Key keyToRehash = keys[i];
-                   int valToRehash = indexes[i];
+                   Node<Key,V> valToRehash = indexes[i];
                    keys[i] = null;
-                   indexes[i] = -1;
+                   indexes[i] = null;
                    --n;
                    put(keyToRehash, valToRehash);
                    i = (i + 1) % m;
@@ -181,4 +179,3 @@ public class LinearProbingHashST<Key>
        }       
    }
 }
-
