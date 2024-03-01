@@ -13,20 +13,18 @@ public class TestCacheSpeed {
 	public static void main(String[] args) throws IOException {
 		//?for easier testing
 	int j = 0;
-	int testCount=7; //* number of different implementations
-	int maxLoops=2*testCount;
+	int testCount=4; //* number of different implementations
+	int maxLoops=3*testCount;
 	long[] each = new long[maxLoops];
 	long[] average = new long[testCount];
-	Cache<String, String> cache = new CacheImpl<>(0);
+	Cache<String, String> cache = new CacheImpl4<>(0) ;
 
-	String[] prints = {
-	"Nodes save Node ref, hashmap saves index: ",
-	"Nodes save Node ref, hashmap saves Node ref: ",
-	"Nodes save Node index, hashmap saves index: ",
-	"Nodes save Node index, hashmap saves Node ref: ",
+	String[] prints = 
+		{
 	"Double Hashing, Nodes save Node ref, hashmap saves index: ",
 	"Double Hashing, Nodes save Node index, hashmap saves Node ref: ",
 	"Double Hashing improved, Nodes save Node ref, hashmap saves index: ",
+	"Seperate chaining, Nodes save Node ref, hashmap saves index: ",
 	};
 
 	
@@ -34,20 +32,14 @@ public class TestCacheSpeed {
 	{	
 		int cachesize = 500;
 		//initialize with your cache implementation
-		if (j%testCount==0)		
-			cache = new CacheImpl<>(cachesize);	//Nodes save Node ref, hashmap saves index
-		else if (j%testCount==1)		
-			cache = new CacheImpl2<>(cachesize);//Nodes save Node ref, hashmap saves Node ref
-		else if (j%testCount==2)		
-			cache = new CacheImpl3<>(cachesize);//Nodes save Node index, hashmap saves index
-		else if (j%testCount==3)		
-			cache = new CacheImpl5<>(cachesize);//Nodes save Node index, hashmap saves Node ref
-		else if (j%testCount==4)		
+		if (j%testCount==0)				
 			cache = new CacheImpl4<>(cachesize);//Double Hashing, Nodes save Node ref, hashmap saves index
-		else if (j%testCount==5)		
+		else if (j%testCount==1)		
 			cache = new CacheImpl6<>(cachesize);//Double Hashing, Nodes save Node index, hashmap saves Node ref
-		else if (j%testCount==6)		
+		else if (j%testCount==2)		
 			cache = new CacheImpl7<>(cachesize);//Double Hashing improved, Nodes save Node ref, hashmap saves index 
+		else if (j%testCount==3)
+			cache = new CacheImpl8<>(cachesize);//Separate chaining, Nodes save Node ref, hashmap saves index 
 		//give path to the dat file
 		String dataFile = "datasets/dataset-5000/data-5000.dat";
 		
