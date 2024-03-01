@@ -1,6 +1,6 @@
 import java.security.Key;
 
-public class LinearProvingHashStDouble<Key> {
+public class LinearProbingHashStDouble<Key> {
 // must be a power of 2
    private static final int INIT_CAPACITY = 128;
 
@@ -13,7 +13,7 @@ public class LinearProvingHashStDouble<Key> {
    /**
     * Initializes an empty symbol table.
     */
-   public LinearProvingHashStDouble() 
+   public LinearProbingHashStDouble() 
    {
        this(INIT_CAPACITY);
    }
@@ -23,7 +23,7 @@ public class LinearProvingHashStDouble<Key> {
     *
     * @param capacity the initial capacity
     */
-   public LinearProvingHashStDouble(int capacity)
+   public LinearProbingHashStDouble(int capacity)
    {
        //m =2* nearestPowerOfTwo(capacity) ;
         m = closestPrime((int) (capacity/0.7));
