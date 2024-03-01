@@ -1,8 +1,11 @@
 
 import java.io.IOException;
-// default:Nodes save Node ref, hashmap saves index
-// 2	  :Nodes save Node ref, hashmap saves Node ref
-// 3	  :Nodes save Node index, hashmap saves index
+
+// CacheImpl: Nodes save Node ref, hashmap saves index
+// CacheImpl2: Nodes save Node ref, hashmap saves Node ref
+// CacheImpl3: Nodes save Node index, hashmap saves index
+// CacheImpl5: Nodes save Node index, hashmap saves Node ref
+// CacheImpl4: Double Hashing, Nodes save Node ref, hashmap saves index
 
 public class TestCacheSpeed {
 
@@ -10,10 +13,18 @@ public class TestCacheSpeed {
 		//?for easier testing
 	int j = 0;
 	int testCount=5; //* number of different implementations
-	int maxLoops=5*testCount;
+	int maxLoops=10*testCount;
 	long[] each = new long[maxLoops];
 	long[] average = new long[testCount];
 	Cache<String, String> cache = new CacheImpl<>(0);
+
+	String[] prints = {
+	"Nodes save Node ref, hashmap saves index: ",
+	"Nodes save Node ref, hashmap saves Node ref: ",
+	"Nodes save Node index, hashmap saves index: ",
+	"Nodes save Node index, hashmap saves Node ref: ",
+	"Double Hashing, Nodes save Node ref, hashmap saves index: "};
+
 	
 	while(j<maxLoops+1) // used to replace first iteration
 	{	
@@ -80,6 +91,7 @@ public class TestCacheSpeed {
 
 		for (int i =0; i<testCount;++i)
 		{	
+			System.out.println(prints[i]);
 			for (j = i; j<each.length;j+=testCount)
 			{
 				average[i]+=each[j];
@@ -90,11 +102,15 @@ public class TestCacheSpeed {
 		}
 
 		System.out.println("Results: ");
-		System.out.println("Nodes save Node ref, hashmap saves index: "+average[0]);
-		System.out.println("Nodes save Node ref, hashmap saves Node ref: "+average[1]);
-		System.out.println("Nodes save Node index, hashmap saves index: "+average[2]);
-		System.out.println("Nodes save Node index, hashmap saves Node ref: "+average[3]);
-		System.out.println("Double Hashing, Nodes save Node ref, hashmap saves index: "+average[4]);
+		for (int i =0; i<testCount;++i)
+		{
+			System.out.println(prints[i] + average[i]);
+		}
+	//	System.out.println("Nodes save Node ref, hashmap saves index: "+average[0]);
+	//	System.out.println("Nodes save Node ref, hashmap saves Node ref: "+average[1]);
+	//	System.out.println("Nodes save Node index, hashmap saves index: "+average[2]);
+	//	System.out.println("Nodes save Node index, hashmap saves Node ref: "+average[3]);
+	//	System.out.println("Double Hashing, Nodes save Node ref, hashmap saves index: "+average[4]);
 	}
 }
 /*
