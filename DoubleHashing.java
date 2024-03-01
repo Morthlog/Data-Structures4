@@ -36,7 +36,7 @@ public class DoubleHashing<Key>
 	{
 //		 m =2* nearestPowerOfTwo(capacity) ;
 		m = closestPrime((int) (capacity / 0.7));
-
+		System.out.println(m);
 		keys = new int[m];
 		indexes = new int[m];
 		primeSize = closestPrime(m);
@@ -98,8 +98,11 @@ public class DoubleHashing<Key>
 	private int hashTwo(int hashedKey)
 	{
 			
-		int k = primeSize - (hashedKey % primeSize);
-		return k;
+//		int k = primeSize - (hashedKey % primeSize);
+//		return k;
+		
+		 int constant =3 /* Choose a constant factor, preferably coprime with primeSize */;
+		    return constant - (hashedKey % 3);
 //		return (hashedKey % 97)+1;
 	}
 
@@ -135,7 +138,9 @@ public class DoubleHashing<Key>
 		prevState = State.PUT;
 		int initialPos = hashToPos(hashedKey);
 //		int initialPos= hashedKey % m;
-		for (i = initialPos; keys[i] != 0; i = (i + k) % m)
+		int f=0;
+		// find position i of key	
+		for (i = initialPos; keys[i] != 0; i = (initialPos + f*k) % m)
 		{
 			// if key is in array, replace value
 			if (keys[i] == hashedKey)
@@ -146,6 +151,7 @@ public class DoubleHashing<Key>
 			// found sentinel, same as empty space
 			if (indexes[i] == -2)
 				break;
+			++f;
 		}
 
 		// key is not in array, put key and index in their respective arrays
@@ -180,7 +186,10 @@ public class DoubleHashing<Key>
 
 		int loopCount = -1;
 
-		for (i = initialPos; keys[i] != 0; i = (i + k) % m)
+		int f=0;
+		// find position i of key	
+		for ( i = initialPos; keys[i] != 0; i = (initialPos + f*k) % m)
+		
 		{
 			if (i == initialPos)
 				++loopCount;
@@ -192,6 +201,7 @@ public class DoubleHashing<Key>
 			{
 				break;
 			}
+			++f;
 		}
 
 		return -1;
@@ -217,9 +227,9 @@ public class DoubleHashing<Key>
 //		int initialPos= hashedKey % m;
 //		int k=primeSize - (hashedKey % primeSize);
 		prevState = State.DELETE;
-		
+		int f=0;
 		// find position i of key	
-		for (int i = initialPos; keys[i] != 0; i = (i + k) % m)
+		for (int i = initialPos; keys[i] != 0; i = (initialPos + f*k) % m)
 		{
 			if (hashedKey == keys[i] && indexes[i] != -2)
 			{
@@ -228,6 +238,7 @@ public class DoubleHashing<Key>
 				--n;
 				break;
 			}
+			++f;
 		}
 	}
 }
