@@ -9,7 +9,7 @@ public class SeparateChainingV1<KEY>
 	SeparateChainingV1(int maxN)
 	{
 		N = 0;
-		M = (int) (maxN /5.0f);
+		M = maxN;
 		heads = new NodeSingle[M];
 	}
 
@@ -47,9 +47,9 @@ public class SeparateChainingV1<KEY>
 	{
 		if (node == null)
 			return -1;
-		if(N==1 && node.key == hashedKey)
+		if(node.key == hashedKey)
 		{
-			node = null;
+			heads[hashToPos(hashedKey)] = node.next;
 			return 0;
 		}
 		else if (node.next!=null && node.next.key == hashedKey)
