@@ -13,38 +13,39 @@ public class TestCacheSpeed {
 	public static void main(String[] args) throws IOException {
 		//?for easier testing
 	int j = 0;
-	int testCount=1; //* number of different implementations
-	int maxLoops=3*testCount;
+	int testCount=2; //* number of different implementations
+	int maxLoops=2*testCount;
 	long[] each = new long[maxLoops];
 	long[] average = new long[testCount];
 	Cache<String, String> cache = new CacheImpl4<>(0) ;
 
 	String[] prints = 
 		{
-	"Double Hashing, Nodes save Node ref, hashmap saves index: ",
-	"Double Hashing, Nodes save Node index, hashmap saves Node ref: ",
-	"Double Hashing improved, Nodes save Node ref, hashmap saves index: ",
-	"Seperate chaining, Nodes save Node ref, hashmap saves index: ",
+//	"Double Hashing, Nodes save Node ref, hashmap saves index: ",
+//	"Double Hashing, Nodes save Node index, hashmap saves Node ref: ",
+//	"Double Hashing improved, Nodes save Node ref, hashmap saves index: ",
+	"Seperate chaining V2, Nodes save Node ref, hashmap saves index: ",
+	"Seperate chaining V1, Nodes save Node ref, hashmap saves index: ",
 	};
 
 	
 	while(j<maxLoops+1) // used to replace first iteration
 	{	
-		int cachesize = 100;
+		int cachesize = 500;
 		//initialize with your cache implementation
 //		if (j%testCount==0)				
 //			cache = new CacheImpl4<>(cachesize);//Double Hashing, Nodes save Node ref, hashmap saves index
 //		else if (j%testCount==1)		
 //			cache = new CacheImpl6<>(cachesize);//Double Hashing, Nodes save Node index, hashmap saves Node ref
-//		else if (j%testCount==2)		
-//			cache = new CacheImpl7<>(cachesize);//Double Hashing improved, Nodes save Node ref, hashmap saves index 
-		 if (j%testCount==0)
-			cache = new CacheImpl8<>(cachesize);//Separate chaining, Nodes save Node ref, hashmap saves index 
+		 if (j%testCount==0)		
+			cache = new CacheImpl8<>(cachesize);//Double Hashing improved, Nodes save Node ref, hashmap saves index 
+		else if (j%testCount==1)
+			cache = new CacheImpl9<>(cachesize);//Separate chaining, Nodes save Node ref, hashmap saves index 
 		//give path to the dat file
-		String dataFile = "datasets/dataset-1000/data-1000.dat";
+		String dataFile = "datasets/dataset-5000/data-5000.dat";
 		
 		//give path to the workload file
-		String requestsFile = "datasets/dataset-1000/requests-10000.dat";
+		String requestsFile = "datasets/dataset-5000/requests-100000.dat";
 
 		DataSource dataSource = new DataSource(dataFile);
 		WorkloadReader requestReader = new WorkloadReader(requestsFile);

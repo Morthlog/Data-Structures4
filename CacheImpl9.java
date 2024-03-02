@@ -6,7 +6,7 @@ public class CacheImpl9<K, V> implements Cache<K, V> {
 
     protected Node<K, V>[] cachedData;
     //* HashMap
-    protected SeparateChaining<K> dataPointer ;
+    protected SeparateChainingV1<K> dataPointer ;
     int size = 0, sizeMax;
     Node<K, V> first = null, last = null;
     long misses = 0, hits=0, lookups=0;
@@ -23,7 +23,7 @@ public class CacheImpl9<K, V> implements Cache<K, V> {
     {
         this.sizeMax = size;
         cachedData = new Node[sizeMax];
-        dataPointer = new SeparateChaining<K>((int)(sizeMax/2.0f));
+        dataPointer = new SeparateChainingV1<K>((sizeMax));
     }
 
 /**

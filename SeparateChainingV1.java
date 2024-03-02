@@ -1,13 +1,12 @@
-//? Fixed put and delete, not feeling it like doing deeper checks for being more efficient, results seem ok
 
-public class SeparateChaining<KEY>
+public class SeparateChainingV1<KEY>
 {
 
 	private NodeSingle[] heads;
 	private int N, M;
 
 	
-	SeparateChaining(int maxN)
+	SeparateChainingV1(int maxN)
 	{
 		N = 0;
 		M = (int) (maxN /5.0f);
@@ -18,15 +17,7 @@ public class SeparateChaining<KEY>
 	{
 		int hashedKey = key.hashCode();
 		int i = hashToPos(hashedKey);
-		NodeSingle temp = heads[i];
-		if (heads[i]== null)
-		{
-			heads[i] = new NodeSingle(hashedKey, index, null);
-			++N;
-			return;
-		}
-		while (temp.next!=null) temp = temp.next;
-			temp.next = new NodeSingle(hashedKey, index, null);
+		heads[i] = new NodeSingle(hashedKey, index, heads[i]);
 		N++;
 	}
 	
@@ -56,9 +47,9 @@ public class SeparateChaining<KEY>
 	{
 		if (node == null)
 			return -1;
-		if(heads[hashToPos(hashedKey)] == node && node.key == hashedKey)
+		if(N==1 && node.key == hashedKey)
 		{
-			heads[hashToPos(hashedKey)] = node.next;
+			node = null;
 			return 0;
 		}
 		else if (node.next!=null && node.next.key == hashedKey)
@@ -76,4 +67,3 @@ public class SeparateChaining<KEY>
 
 	}
 }
-
