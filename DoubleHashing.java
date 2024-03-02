@@ -16,7 +16,7 @@ public class DoubleHashing<Key>
 	State prevState = State.INITIAL;
 
 	int savedHash, savedK;
-
+	int idxToDelete;
 	/**
 	 * Initializes an empty symbol table.
 	 */
@@ -184,7 +184,11 @@ public class DoubleHashing<Key>
 				++loopCount;
 
 			if (keys[i] == hashedKey && indexes[i] != -2)
+			{
+				idxToDelete=i;
 				return indexes[i];
+			}
+				
 
 			if (i == initialPos && loopCount == 1)
 			{
@@ -203,30 +207,39 @@ public class DoubleHashing<Key>
 	 * @throws Exception
 	 * @throws IllegalArgumentException if {@code key} is {@code null}
 	 */
-	public void delete(Key key)
+//	public void delete(Key key)
+//	{
+//		if (key == null)
+//			throw new IllegalArgumentException("argument to delete() is null");
+//
+//		int hashedKey = key.hashCode();
+//		
+//		int k = hashTwo(hashedKey);	
+//		int initialPos =hashToPos(hashedKey);
+////		int initialPos= hashedKey % m;
+////		int k=primeSize - (hashedKey % primeSize);
+//		prevState = State.DELETE;
+//		
+//		// find position i of key	
+//		for (int i = initialPos; keys[i] != 0; i = (i + k) % m)
+//		{
+//			if (hashedKey == keys[i] && indexes[i] != -2)
+//			{
+//				// delete key and associated value
+//				indexes[i] = -2;
+//				--n;
+//				break;
+//			}
+//		}
+//	}
+	
+	public void delete()
 	{
-		if (key == null)
-			throw new IllegalArgumentException("argument to delete() is null");
-
-		int hashedKey = key.hashCode();
-		
-		int k = hashTwo(hashedKey);	
-		int initialPos =hashToPos(hashedKey);
-//		int initialPos= hashedKey % m;
-//		int k=primeSize - (hashedKey % primeSize);
-		prevState = State.DELETE;
-		
-		// find position i of key	
-		for (int i = initialPos; keys[i] != 0; i = (i + k) % m)
+		if (indexes[idxToDelete] != -2)
 		{
-			if (hashedKey == keys[i] && indexes[i] != -2)
-			{
-				// delete key and associated value
-				indexes[i] = -2;
-				--n;
-				break;
-			}
+			indexes[idxToDelete]=-2;
 		}
+		prevState = State.DELETE;
 	}
 }
 

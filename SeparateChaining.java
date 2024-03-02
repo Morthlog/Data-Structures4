@@ -10,7 +10,7 @@ public class SeparateChaining<KEY>
 	SeparateChaining(int maxN)
 	{
 		N = 0;
-		M = maxN*2;
+		M = maxN/5;
 		heads = new NodeSingle[M];
 	}
 

@@ -99,7 +99,7 @@ public class CacheImpl7<K, V> implements Cache<K, V> {
             first = first.next;
             
             //! delete lastKey from hashMap
-            dataPointer.delete(lastKey);   
+            dataPointer.delete();   
 
             //! add to hashMap which points to index of lastKey, which is now first
             dataPointer.put(key, ind);

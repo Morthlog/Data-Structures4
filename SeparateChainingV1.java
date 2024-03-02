@@ -9,7 +9,7 @@ public class SeparateChainingV1<KEY>
 	SeparateChainingV1(int maxN)
 	{
 		N = 0;
-		M = maxN;
+		M = maxN/10;
 		heads = new NodeSingle[M];
 	}
 
