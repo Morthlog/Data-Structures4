@@ -132,8 +132,7 @@ public class CacheImpl7<K, V> implements Cache<K, V> {
 	public double getHitRatio()
     {
 		if(lookups>0L)		
-			return (double) hits/lookups;	
-			
+			return (double) hits/lookups;			
 		else	
 			return 0;		
     }

@@ -1,69 +1,86 @@
 
 public class SeparateChainingV1<KEY>
 {
+	enum State
+	{
+		INITIAL, GET, PUT, DELETE
+	}
 
 	private NodeSingle[] heads;
 	private int N, M;
 
-	
+	int savedHash = 0;
+	int savedHashPos = 0;
+	State prevState = State.INITIAL;
+
 	SeparateChainingV1(int maxN)
 	{
 		N = 0;
-		M = maxN/10;
+		M = maxN;
 		heads = new NodeSingle[M];
 	}
 
 	void put(KEY key, int index)
 	{
-		int hashedKey = key.hashCode();
-		int i = hashToPos(hashedKey);
+		int hashedKey;
+		int i;
+		if (prevState == State.GET)
+		{
+			hashedKey = savedHash;
+			i = savedHashPos;
+		} 
+		else
+		{
+			hashedKey = key.hashCode();
+			i = hashToPos(hashedKey);
+		}
+
+		prevState = State.PUT;
+
 		heads[i] = new NodeSingle(hashedKey, index, heads[i]);
 		N++;
 	}
-	
+
 	int get(KEY key)
 	{
-		int hashedKey = key.hashCode();
-		return searchR(heads[hashToPos(hashedKey)], hashedKey);
-	}
+		savedHash = key.hashCode();
+		savedHashPos = hashToPos(savedHash);
+		
+		prevState = State.GET;
 
-	private int searchR(NodeSingle t, int hashedKey)
-	{
-		if (t == null)
-			return -1;
-		if (t.key == hashedKey)
-			return t.index;
-		return searchR(t.next, hashedKey);
+		for (NodeSingle node = heads[savedHashPos]; node != null; node = node.next)
+		{
+			if (node.key == savedHash)
+				return node.index;
+		}
+		return -1;
 	}
 
 	public void delete(KEY key)
 	{
+		prevState = State.DELETE;
 		int hashedKey = key.hashCode();
-		if (deleteR(heads[hashToPos(hashedKey)], hashedKey) ==0)
-			N--;
-	}
-
-	int deleteR(NodeSingle node, int hashedKey)
-	{
-		if (node == null)
-			return -1;
-		if(node.key == hashedKey)
+		int hashToPos=hashToPos(hashedKey);
+		
+		for (NodeSingle node = heads[hashToPos]; node != null; node = node.next)
 		{
-			heads[hashToPos(hashedKey)] = node.next;
-			return 0;
+			if (node.key == hashedKey)
+			{
+				heads[hashToPos] = node.next;
+				--N;
+			} 
+			else if (node.next != null && node.next.key == hashedKey)
+			{
+				node.next = node.next.next;
+				--N;
+			}
 		}
-		else if (node.next!=null && node.next.key == hashedKey)
-		{
-			node.next = node.next.next;
-			return 0;
-		}	
-		return deleteR(node.next, hashedKey);
 	}
 
 	private int hashToPos(int hashedKey)
 	{
 		hashedKey ^= (hashedKey >>> 20) ^ (hashedKey >>> 12) ^ (hashedKey >>> 7) ^ (hashedKey >>> 4);
-	       return hashedKey & (M-1);
+		return hashedKey & (M - 1);
 
 	}
 }

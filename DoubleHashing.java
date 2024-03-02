@@ -15,8 +15,9 @@ public class DoubleHashing<Key>
 	int primeSize;
 	State prevState = State.INITIAL;
 
-	int savedHash, savedK;
+	int savedHash, savedK, savedHashPos;
 	int idxToDelete;
+
 	/**
 	 * Initializes an empty symbol table.
 	 */
@@ -86,16 +87,16 @@ public class DoubleHashing<Key>
 	}
 
 	private int hashToPos(int hashedKey)
-	{	
-       return hashedKey % m;
+	{
+		return hashedKey % m;
 //		hashedKey ^= (hashedKey >>> 20) ^ (hashedKey >>> 12) ^ (hashedKey >>> 7) ^ (hashedKey >>> 4);
 //	       return hashedKey & (m-1);
 
 	}
-	
+
 	private int hashTwo(int hashedKey)
 	{
-			
+
 		int k = primeSize - (hashedKey % primeSize);
 		return k;
 //		return (hashedKey % 97)+1;
@@ -114,24 +115,23 @@ public class DoubleHashing<Key>
 
 		int i;
 		int k;
-		
-		int hashedKey;
 
+		int hashedKey;
+		int initialPos;
 		if (prevState == State.GET)
 		{
 			k = savedK;
 			hashedKey = savedHash;
-		} 
+			initialPos = savedHashPos;
+		}
 		else
 		{
 			hashedKey = key.hashCode();
-			k = hashTwo(hashedKey);		
-			
-//			k=primeSize - (hashedKey % primeSize);
-			
+			k = hashTwo(hashedKey);
+			initialPos = hashToPos(hashedKey);
+//			k=primeSize - (hashedKey % primeSize);		
 		}
 		prevState = State.PUT;
-		int initialPos = hashToPos(hashedKey);
 //		int initialPos= hashedKey % m;
 		for (i = initialPos; keys[i] != 0; i = (i + k) % m)
 		{
@@ -167,30 +167,26 @@ public class DoubleHashing<Key>
 
 		prevState = State.GET;
 		int i;
-		int hashedKey = key.hashCode();
-		int k = hashTwo(hashedKey);	
-		int initialPos = hashToPos(hashedKey);
+		savedHash = key.hashCode();
+		savedK = hashTwo(savedHash);
+		savedHashPos = hashToPos(savedHash);
 //		int initialPos= hashedKey % m;
 //		int k=primeSize - (hashedKey % primeSize);
-		
-		savedHash = hashedKey;
-		savedK = k;
 
 		int loopCount = -1;
 
-		for (i = initialPos; keys[i] != 0; i = (i + k) % m)
+		for (i = savedHashPos; keys[i] != 0; i = (i + savedK) % m)
 		{
-			if (i == initialPos)
+			if (i == savedHashPos)
 				++loopCount;
 
-			if (keys[i] == hashedKey && indexes[i] != -2)
+			if (keys[i] == savedHash && indexes[i] != -2)
 			{
-				idxToDelete=i;
+				idxToDelete = i;
 				return indexes[i];
 			}
-				
 
-			if (i == initialPos && loopCount == 1)
+			if (i == savedHashPos && loopCount == 1)
 			{
 				break;
 			}
@@ -203,43 +199,11 @@ public class DoubleHashing<Key>
 	 * Removes the specified key and its associated value from this symbol table (if
 	 * the key is in this symbol table).
 	 *
-	 * @param key the key
-	 * @throws Exception
-	 * @throws IllegalArgumentException if {@code key} is {@code null}
+	 * 
 	 */
-//	public void delete(Key key)
-//	{
-//		if (key == null)
-//			throw new IllegalArgumentException("argument to delete() is null");
-//
-//		int hashedKey = key.hashCode();
-//		
-//		int k = hashTwo(hashedKey);	
-//		int initialPos =hashToPos(hashedKey);
-////		int initialPos= hashedKey % m;
-////		int k=primeSize - (hashedKey % primeSize);
-//		prevState = State.DELETE;
-//		
-//		// find position i of key	
-//		for (int i = initialPos; keys[i] != 0; i = (i + k) % m)
-//		{
-//			if (hashedKey == keys[i] && indexes[i] != -2)
-//			{
-//				// delete key and associated value
-//				indexes[i] = -2;
-//				--n;
-//				break;
-//			}
-//		}
-//	}
-	
 	public void delete()
 	{
-		if (indexes[idxToDelete] != -2)
-		{
-			indexes[idxToDelete]=-2;
-		}
+		indexes[idxToDelete] = -2;
 		prevState = State.DELETE;
 	}
 }
-
