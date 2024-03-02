@@ -1,3 +1,4 @@
+//? Fixed put and delete, not feeling it like doing deeper checks for being more efficient, results seem ok
 
 public class SeparateChaining<KEY>
 {
@@ -9,7 +10,7 @@ public class SeparateChaining<KEY>
 	SeparateChaining(int maxN)
 	{
 		N = 0;
-		M = maxN *2;
+		M = (int) (maxN /5);
 		heads = new NodeSingle[M];
 	}
 
@@ -17,7 +18,15 @@ public class SeparateChaining<KEY>
 	{
 		int hashedKey = key.hashCode();
 		int i = hashToPos(hashedKey);
-		heads[i] = new NodeSingle(hashedKey, index, heads[i]);
+		NodeSingle temp = heads[i];
+		if (heads[i]== null)
+		{
+			heads[i] = new NodeSingle(hashedKey, index, null);
+			++N;
+			return;
+		}
+		while (temp.next!=null) temp = temp.next;
+			temp.next = new NodeSingle(hashedKey, index, null);
 		N++;
 	}
 	
@@ -47,9 +56,9 @@ public class SeparateChaining<KEY>
 	{
 		if (node == null)
 			return -1;
-		if(N==1 && node.key == hashedKey)
+		if(heads[hashToPos(hashedKey)] == node && node.key == hashedKey)
 		{
-			node = null;
+			heads[hashToPos(hashedKey)] = node.next;
 			return 0;
 		}
 		else if (node.next!=null && node.next.key == hashedKey)
