@@ -9,7 +9,7 @@ public class CacheImpl9<K, V> implements Cache<K, V> {
     protected SeparateChainingV1<K> dataPointer ;
     int size = 0, sizeMax;
     Node<K, V> first = null, last = null;
-    long misses = 0, hits=0, lookups=0;
+    long misses = 0, hits = 0, lookups = 0;
   
     @SuppressWarnings("unchecked")
     CacheImpl9()
@@ -33,18 +33,18 @@ public class CacheImpl9<K, V> implements Cache<K, V> {
 	 */
 	public V lookUp(K key)
     {
-		lookups++;
+		++lookups;
         int index = 0;
         //! search in HashMap for key and return the node's data
         index = dataPointer.get(key);
         if (index == -1)
         {
-        	misses++;
+        	++misses;
             return null;
         }
         else
         {
-        	hits++;
+        	++hits;
             if (cachedData[index] == last)
             {
                 first.next = last;
@@ -132,8 +132,7 @@ public class CacheImpl9<K, V> implements Cache<K, V> {
 	public double getHitRatio()
     {
 		if(lookups>0L)		
-			return (double) hits/lookups;	
-			
+			return (double) hits/lookups;			
 		else	
 			return 0;		
     }
