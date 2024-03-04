@@ -10,12 +10,13 @@ public class DoubleHashing<Key>
 
 	private int n = 0; // number of key-value pairs in the symbol table
 	private int m; // size of linear probing table
-	private int[] keys; // the keys
+	private Key[] keys; // the keys
 	private int[] indexes; // the values
 	int primeSize;
 	State prevState = State.INITIAL;
 
-	int savedHash, savedK, savedHashPos;
+	//Key savedKey;
+	int savedK, savedHashPos;
 	int idxToDelete;
 
 	/**
@@ -36,7 +37,7 @@ public class DoubleHashing<Key>
 //		 m =2* nearestPowerOfTwo(capacity) ;
 		m = closestPrime((int) (capacity / 0.7));
 
-		keys = new int[m];
+		keys = (Key[]) new Object[m];
 		indexes = new int[m];
 		primeSize = closestPrime(m);
 	}
@@ -121,7 +122,7 @@ public class DoubleHashing<Key>
 		if (prevState == State.GET)
 		{
 			k = savedK;
-			hashedKey = savedHash;
+	//!		hashedKey = savedHash;
 			initialPos = savedHashPos;
 		}
 		else
@@ -133,10 +134,10 @@ public class DoubleHashing<Key>
 		}
 		prevState = State.PUT;
 //		int initialPos= hashedKey % m;
-		for (i = initialPos; keys[i] != 0; i = (i + k) % m)
+		for (i = initialPos; keys[i] != null; i = (i + k) % m)
 		{
 			// if key is in array, replace value
-			if (keys[i] == hashedKey)
+			if (keys[i].equals(key))
 			{
 				indexes[i] = val;
 				return;
@@ -147,7 +148,7 @@ public class DoubleHashing<Key>
 		}
 
 		// key is not in array, put key and index in their respective arrays
-		keys[i] = hashedKey;
+		keys[i] = key;
 		indexes[i] = val;
 		++n;
 	}
@@ -167,20 +168,20 @@ public class DoubleHashing<Key>
 
 		prevState = State.GET;
 		int i;
-		savedHash = key.hashCode();
-		savedK = hashTwo(savedHash);
-		savedHashPos = hashToPos(savedHash);
+	//	savedKey = key;
+		savedK = hashTwo(key.hashCode());
+		savedHashPos = hashToPos(key.hashCode());
 //		int initialPos= hashedKey % m;
 //		int k=primeSize - (hashedKey % primeSize);
 
 		int loopCount = -1;
 
-		for (i = savedHashPos; keys[i] != 0; i = (i + savedK) % m)
+		for (i = savedHashPos; keys[i] != null; i = (i + savedK) % m)
 		{
 			if (i == savedHashPos)
 				++loopCount;
 
-			if (keys[i] == savedHash && indexes[i] != -2)
+			if (keys[i].equals(key) && indexes[i] != -2)
 			{
 				idxToDelete = i;
 				return indexes[i];

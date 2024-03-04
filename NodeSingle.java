@@ -1,11 +1,11 @@
 
-public class NodeSingle
+public class NodeSingle<Key>
 {
-	int key = 0;
+	Key key = null;
 	int index = -1;
-	NodeSingle next = null;
+	NodeSingle<Key> next = null;
 
-	NodeSingle(int key, int index, NodeSingle node)
+	NodeSingle(Key key, int index, NodeSingle<Key> node)
 	{
 		this.key = key;
 		this.index = index;
