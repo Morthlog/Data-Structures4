@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class SeparateChainingV1<KEY>
 {
@@ -40,6 +41,7 @@ public class SeparateChainingV1<KEY>
 
 	int get(KEY key)
 	{
+		//calcChainSize();
 		savedHashPos = hashToPos(key.hashCode());		
 		prevState = State.GET;
 
@@ -54,29 +56,31 @@ public class SeparateChainingV1<KEY>
 	public void delete(KEY key)
 	{
 		prevState = State.DELETE;
-		int hashToPos=hashToPos(key.hashCode());
+		int hashToPos = hashToPos(key.hashCode());
 		
-		for (NodeSingle<KEY> node = heads[hashToPos]; node != null; node = node.next)
+		if (heads[hashToPos].key.equals(key))
 		{
-			if (node.key.equals(key))
-			{
-				heads[hashToPos] = node.next;
-				--N;
-			} 
-			else if (node.next != null && node.next.key.equals(key))
+			heads[hashToPos] = heads[hashToPos].next;
+			--N;
+			return;
+		} 
+		for (NodeSingle<KEY> node = heads[hashToPos]; node != null; node = node.next)
+		{		
+			if (node.next != null && node.next.key.equals(key))
 			{
 				node.next = node.next.next;
 				--N;
+				break;
 			}
 		}
 	}
-
+	
 	private int hashToPos(int hashedKey)
 	{
 		// copied hashed function from hashmap
 		return (hashedKey ^ (hashedKey >>> 16)) & (M - 1);
-	//	hashedKey ^= (hashedKey >>> 20) ^ (hashedKey >>> 12) ^ (hashedKey >>> 7) ^ (hashedKey >>> 4);
-	//	return hashedKey & (M - 1);
+//		hashedKey ^= (hashedKey >>> 20) ^ (hashedKey >>> 12) ^ (hashedKey >>> 7) ^ (hashedKey >>> 4);
+//		return hashedKey & (M - 1);
 
 	}
 }
