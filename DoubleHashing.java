@@ -98,8 +98,8 @@ public class DoubleHashing<Key>
 	private int hashTwo(int hashedKey)
 	{
 
-		int k = primeSize - (hashedKey % primeSize);
-		return k;
+		
+		return primeSize - (hashedKey % primeSize);
 //		return (hashedKey % 97)+1;
 	}
 
@@ -114,11 +114,10 @@ public class DoubleHashing<Key>
 		if (key == null)
 			throw new IllegalArgumentException("first argument to put() is null");
 
-		int i;
-		int k;
+		int i, k;
 
-		int hashedKey;
-		int initialPos;
+		int hashedKey, initialPos;
+
 		if (prevState == State.GET)
 		{
 			k = savedK;

@@ -16,7 +16,7 @@ public class SeparateChainingV1<KEY>
 	SeparateChainingV1(int maxN)
 	{
 		N = 0;
-		M = maxN;
+		M = 2*maxN;
 		heads = new NodeSingle[M];
 	}
 
@@ -79,8 +79,10 @@ public class SeparateChainingV1<KEY>
 
 	private int hashToPos(int hashedKey)
 	{
-		hashedKey ^= (hashedKey >>> 20) ^ (hashedKey >>> 12) ^ (hashedKey >>> 7) ^ (hashedKey >>> 4);
-		return hashedKey & (M - 1);
+		// copied hashed function from hashmap
+		return (hashedKey ^ (hashedKey >>> 16)) & (M - 1);
+	//	hashedKey ^= (hashedKey >>> 20) ^ (hashedKey >>> 12) ^ (hashedKey >>> 7) ^ (hashedKey >>> 4);
+	//	return hashedKey & (M - 1);
 
 	}
 }

@@ -23,7 +23,7 @@ public class CacheImpl9<K, V> implements Cache<K, V> {
     {
         this.sizeMax = size;
         cachedData = new Node[sizeMax];
-        dataPointer = new SeparateChainingV1<K>((sizeMax));
+        dataPointer = new SeparateChainingV1<K>(sizeMax);
     }
 
 /**
@@ -33,27 +33,24 @@ public class CacheImpl9<K, V> implements Cache<K, V> {
 	 */
 	public V lookUp(K key)
     {
-		lookups++;
+		++lookups;
         int index = 0;
         //! search in HashMap for key and return the node's data
         index = dataPointer.get(key);
         if (index == -1)
         {
-        	misses++;
+        	++misses;
             return null;
         }
         else
         {
-        	hits++;
+        	++hits;
             if (cachedData[index] == last)
             {
                 first.next = last;
+                last.prev = first;
+
                 last = last.next;
-                
-                last.prev = null;
-                first.next.next = null;
-                
-                first.next.prev = first;
                 first = first.next;
             }
             else if (cachedData[index] != first) // no position update needed
@@ -63,7 +60,6 @@ public class CacheImpl9<K, V> implements Cache<K, V> {
 
                 first.next = cachedData[index];
                 cachedData[index].prev = first;
-                cachedData[index].next = null;
                 first = cachedData[index];
             }
 
@@ -89,13 +85,9 @@ public class CacheImpl9<K, V> implements Cache<K, V> {
             last.key = key;
             last.prev = first;
 
-            // remove connection between last and second from last
             last = last.next;
-            last.prev.next = null;
-            last.prev = null;
 
             // finish movement of last to the start
-            first.next.prev = first;
             first = first.next;
             
             //! delete lastKey from hashMap
@@ -132,8 +124,7 @@ public class CacheImpl9<K, V> implements Cache<K, V> {
 	public double getHitRatio()
     {
 		if(lookups>0L)		
-			return (double) hits/lookups;	
-			
+			return (double) hits/lookups;
 		else	
 			return 0;		
     }

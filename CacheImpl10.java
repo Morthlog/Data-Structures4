@@ -35,19 +35,19 @@ public class CacheImpl10<K, V> implements Cache<K, V> {
 	 */
 	public V lookUp(K key)
     {
-		lookups++;
+		++lookups;
         int index = 0;
         //! search in HashMap for key and return the node's data
         Integer idx=dataPointer.get(key);
         if (idx==null)
         {
-        	misses++;
+        	++misses;
             return null;
         }
         else
         {
         	index=idx;
-        	hits++;
+        	++hits;
             if (cachedData[index] == last)
             {
                 first.next = last;
