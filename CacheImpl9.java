@@ -9,7 +9,7 @@ public class CacheImpl9<K, V> implements Cache<K, V> {
     protected SeparateChainingV1<K> dataPointer ;
     int size = 0, sizeMax;
     Node<K, V> first = null, last = null;
-    long misses = 0, hits=0, lookups=0;
+    long misses = 0, hits = 0, lookups = 0;
   
     @SuppressWarnings("unchecked")
     CacheImpl9()

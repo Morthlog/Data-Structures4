@@ -9,10 +9,10 @@ public class SeparateChainingV1<KEY>
 	private NodeSingle<KEY>[] heads;
 	private int N, M;
 
-//	int savedHash = 0;
 	int savedHashPos = 0;
 	State prevState = State.INITIAL;
 
+	@SuppressWarnings("unchecked")
 	SeparateChainingV1(int maxN)
 	{
 		N = 0;
@@ -22,30 +22,25 @@ public class SeparateChainingV1<KEY>
 
 	void put(KEY key, int index)
 	{
-	//	int hashedKey;
 		int i;
 		if (prevState == State.GET)
 		{
-		//	hashedKey = savedHash;
 			i = savedHashPos;
 		} 
 		else
 		{
-		//	hashedKey = key.hashCode();
 			i = hashToPos(key.hashCode());
 		}
 
 		prevState = State.PUT;
 
 		heads[i] = new NodeSingle<KEY>(key, index, heads[i]);
-		N++;
+		++N;
 	}
 
 	int get(KEY key)
 	{
-	//	savedHash = key.hashCode();
-		savedHashPos = hashToPos(key.hashCode());
-		
+		savedHashPos = hashToPos(key.hashCode());		
 		prevState = State.GET;
 
 		for (NodeSingle<KEY> node = heads[savedHashPos]; node != null; node = node.next)
@@ -59,7 +54,6 @@ public class SeparateChainingV1<KEY>
 	public void delete(KEY key)
 	{
 		prevState = State.DELETE;
-	//	int hashedKey = key.hashCode();
 		int hashToPos=hashToPos(key.hashCode());
 		
 		for (NodeSingle<KEY> node = heads[hashToPos]; node != null; node = node.next)
