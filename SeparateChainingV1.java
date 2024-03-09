@@ -20,17 +20,17 @@ public class SeparateChainingV1<KEY>
 		M = 2*maxN;
 		heads = new NodeSingle[M];
 	}
-
+	
 	void put(KEY key, int index)
-	{
+	{		
 		int i;
-		if (prevState == State.GET)
+		if (prevState == State.DELETE)
 		{
-			i = savedHashPos;
+			i = hashToPos(key.hashCode());			
 		} 
 		else
 		{
-			i = hashToPos(key.hashCode());
+			i = savedHashPos;			
 		}
 
 		prevState = State.PUT;
@@ -41,7 +41,6 @@ public class SeparateChainingV1<KEY>
 
 	int get(KEY key)
 	{
-		//calcChainSize();
 		savedHashPos = hashToPos(key.hashCode());		
 		prevState = State.GET;
 
@@ -56,15 +55,14 @@ public class SeparateChainingV1<KEY>
 	public void delete(KEY key)
 	{
 		prevState = State.DELETE;
-		int hashToPos = hashToPos(key.hashCode());
 		
-		if (heads[hashToPos].key.equals(key))
+		if (heads[savedHashPos].key.equals(key))
 		{
-			heads[hashToPos] = heads[hashToPos].next;
+			heads[savedHashPos] = heads[savedHashPos].next;
 			--N;
 			return;
 		} 
-		for (NodeSingle<KEY> node = heads[hashToPos]; node != null; node = node.next)
+		for (NodeSingle<KEY> node = heads[savedHashPos]; node != null; node = node.next)
 		{		
 			if (node.next != null && node.next.key.equals(key))
 			{
