@@ -1,7 +1,3 @@
-//? Optimization idea
-//? Nodes will know the index for prev and next, instead of having a copy of the nodes
-//? Nodes will require info of their own index
-
 public class CacheImpl9<K, V> implements Cache<K, V> {
 
     protected Node<K, V>[] cachedData;
@@ -80,14 +76,12 @@ public class CacheImpl9<K, V> implements Cache<K, V> {
             K lastKey = last.getKey();
             int ind = dataPointer.get(lastKey);
             first.next = last;
+            last.prev = first;
             // replace data of last with new data
             last.data = value;
             last.key = key;
-            last.prev = first;
 
             last = last.next;
-
-            // finish movement of last to the start
             first = first.next;
             
             //! delete lastKey from hashMap

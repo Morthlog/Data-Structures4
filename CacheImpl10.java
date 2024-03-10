@@ -36,7 +36,7 @@ public class CacheImpl10<K, V> implements Cache<K, V> {
 	public V lookUp(K key)
     {
 		++lookups;
-        int index = 0;
+   //     int index = 0;
         //! search in HashMap for key and return the node's data
         Integer idx=dataPointer.get(key);
         if (idx==null)
@@ -46,31 +46,30 @@ public class CacheImpl10<K, V> implements Cache<K, V> {
         }
         else
         {
-        	index=idx;
         	++hits;
-            if (cachedData[index] == last)
+            if (cachedData[idx] == last)
             {
                 first.next = last;
                 last = last.next;
                 
-                last.prev = null;
-                first.next.next = null;
+            //    last.prev = null;
+            //    first.next.next = null;
                 
-                first.next.prev = first;
+            //    first.next.prev = first;
                 first = first.next;
             }
-            else if (cachedData[index] != first) // no position update needed
+            else if (cachedData[idx] != first) // no position update needed
             {
-                cachedData[index].prev.next = cachedData[index].next;
-                cachedData[index].next.prev = cachedData[index].prev;
+                cachedData[idx].prev.next = cachedData[idx].next;
+                cachedData[idx].next.prev = cachedData[idx].prev;
 
-                first.next = cachedData[index];
-                cachedData[index].prev = first;
-                cachedData[index].next = null;
-                first = cachedData[index];
+                first.next = cachedData[idx];
+                cachedData[idx].prev = first;
+            //    cachedData[idx].next = null;
+                first = cachedData[idx];
             }
 
-            return cachedData[index].getData();
+            return cachedData[idx].getData();
         }
     }
 	
@@ -94,11 +93,11 @@ public class CacheImpl10<K, V> implements Cache<K, V> {
 
             // remove connection between last and second from last
             last = last.next;
-            last.prev.next = null;
-            last.prev = null;
+          //  last.prev.next = null;
+          //  last.prev = null;
 
             // finish movement of last to the start
-            first.next.prev = first;
+        //    first.next.prev = first;
             first = first.next;
             
             //! delete lastKey from hashMap

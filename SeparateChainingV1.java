@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class SeparateChainingV1<KEY>
 {
 	enum State
@@ -8,7 +6,7 @@ public class SeparateChainingV1<KEY>
 	}
 
 	private NodeSingle<KEY>[] heads;
-	private int N, M;
+	private int M;
 
 	int savedHashPos = 0;
 	State prevState = State.INITIAL;
@@ -16,7 +14,6 @@ public class SeparateChainingV1<KEY>
 	@SuppressWarnings("unchecked")
 	SeparateChainingV1(int maxN)
 	{
-		N = 0;
 		M = 2*maxN;
 		heads = new NodeSingle[M];
 	}
@@ -36,7 +33,6 @@ public class SeparateChainingV1<KEY>
 		prevState = State.PUT;
 
 		heads[i] = new NodeSingle<KEY>(key, index, heads[i]);
-		++N;
 	}
 
 	int get(KEY key)
@@ -59,15 +55,13 @@ public class SeparateChainingV1<KEY>
 		if (heads[savedHashPos].key.equals(key))
 		{
 			heads[savedHashPos] = heads[savedHashPos].next;
-			--N;
 			return;
 		} 
-		for (NodeSingle<KEY> node = heads[savedHashPos]; node != null; node = node.next)
+		for (NodeSingle<KEY> node = heads[savedHashPos]; node.next != null; node = node.next)
 		{		
-			if (node.next != null && node.next.key.equals(key))
+			if (node.next.key.equals(key))
 			{
 				node.next = node.next.next;
-				--N;
 				break;
 			}
 		}
@@ -75,10 +69,6 @@ public class SeparateChainingV1<KEY>
 	
 	private int hashToPos(int hashedKey)
 	{
-		// copied hashed function from hashmap
 		return (hashedKey ^ (hashedKey >>> 16)) & (M - 1);
-//		hashedKey ^= (hashedKey >>> 20) ^ (hashedKey >>> 12) ^ (hashedKey >>> 7) ^ (hashedKey >>> 4);
-//		return hashedKey & (M - 1);
-
 	}
 }
