@@ -30,9 +30,8 @@ public class CacheImpl9<K, V> implements Cache<K, V> {
 	public V lookUp(K key)
     {
 		++lookups;
-        int index = 0;
         //! search in HashMap for key and return the node's data
-        index = dataPointer.get(key);
+        int index = dataPointer.get(key);
         if (index == -1)
         {
         	++misses;
