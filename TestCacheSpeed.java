@@ -14,10 +14,10 @@ public class TestCacheSpeed {
 		//?for easier testing
 	int j = 0;
 	int testCount=2; //* number of different implementations
-	int maxLoops=1*testCount;
+	int maxLoops=5*testCount;
 	long[] each = new long[maxLoops];
 	long[] average = new long[testCount];
-	Cache<String, String> cache = new CacheImpl4<>(0) ;
+	Cache<String, String> cache = new CacheImpl11<>(0) ;
 
 	String[] prints = 
 		{
@@ -25,7 +25,8 @@ public class TestCacheSpeed {
 //	"Double Hashing, Nodes save Node index, hashmap saves Node ref: ",
 //	"Double Hashing improved, Nodes save Node ref, hashmap saves index: ",
 //	"Seperate chaining V2  maxN/5, Nodes save Node ref, hashmap saves index: ",
-	"Seperate chaining V1 maxN, Nodes save Node ref, hashmap saves index: ",
+	"Seperate chaining V1 maxN*2, Nodes save Node ref, hashmap saves index: ",
+	"Seperate chaining V3 maxN*2, Nodes save Node ref, hashmap saves index: ",
 	"Java hashmap, Nodes save Node ref, hashmap saves index: ",
 	};
 
@@ -42,8 +43,10 @@ public class TestCacheSpeed {
 //			cache = new CacheImpl8<>(cachesize);//Separate chaining v2, Nodes save Node ref, hashmap saves index 
 		 if (j%testCount==0)
 			cache = new CacheImpl9<>(cachesize);//Separate chaining v1, Nodes save Node ref, hashmap saves index 
-		 else if (j%testCount==1)
-				cache = new CacheImpl10<>(cachesize);//Java hashmap,, Nodes save Node ref, hashmap saves index
+		 if (j%testCount==1)
+				cache = new CacheImpl11<>(cachesize);//Separate chaining v3, Nodes save Node ref, hashmap saves index 
+//		 else if (j%testCount==1)
+//				cache = new CacheImpl10<>(cachesize);//Java hashmap,, Nodes save Node ref, hashmap saves index
 		//give path to the dat file
 		String dataFile = "datasets/dataset-5000/data-5000.dat";
 		
