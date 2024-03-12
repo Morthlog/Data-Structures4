@@ -17,7 +17,7 @@ public class TestCacheSpeed {
 	int maxLoops=1*testCount;
 	long[] each = new long[maxLoops];
 	long[] average = new long[testCount];
-	Cache<String, String> cache = new CacheImpl4<>(0) ;
+	Cache<String, String> cache = new CacheImpl<>(0) ;
 
 	String[] prints = 
 		{
@@ -32,7 +32,7 @@ public class TestCacheSpeed {
 	
 	while(j<maxLoops+1) // used to replace first iteration
 	{	
-		int cachesize = 500;
+		int cachesize = 100;
 		//initialize with your cache implementation
 //		if (j%testCount==0)				
 //			cache = new CacheImpl4<>(cachesize);//Double Hashing, Nodes save Node ref, hashmap saves index
@@ -41,14 +41,14 @@ public class TestCacheSpeed {
 //		else if (j%testCount==1)		
 //			cache = new CacheImpl8<>(cachesize);//Separate chaining v2, Nodes save Node ref, hashmap saves index 
 		 if (j%testCount==0)
-			cache = new CacheImpl9<>(cachesize);//Separate chaining v1, Nodes save Node ref, hashmap saves index 
-		 else if (j%testCount==1)
-				cache = new CacheImpl10<>(cachesize);//Java hashmap,, Nodes save Node ref, hashmap saves index
+			cache = new CacheImpl<>(cachesize);//Separate chaining v1, Nodes save Node ref, hashmap saves index 
+		//  else if (j%testCount==1)
+		// 		cache = new CacheImpl10<>(cachesize);//Java hashmap,, Nodes save Node ref, hashmap saves index
 		//give path to the dat file
-		String dataFile = "datasets/dataset-5000/data-5000.dat";
+		String dataFile = "datasets/dataset-1000/data-1000.dat";
 		
 		//give path to the workload file
-		String requestsFile = "datasets/dataset-5000/requests-100000.dat";
+		String requestsFile = "datasets/dataset-1000/requests-10000.dat";
 
 		DataSource dataSource = new DataSource(dataFile);
 		WorkloadReader requestReader = new WorkloadReader(requestsFile);

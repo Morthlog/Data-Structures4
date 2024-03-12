@@ -1,29 +1,25 @@
-//? Optimization idea
-//? Nodes will know the index for prev and next, instead of having a copy of the nodes
-//? Nodes will require info of their own index
-
-public class CacheImpl8<K, V> implements Cache<K, V> {
+public class CacheImpl<K, V> implements Cache<K, V> {
 
     protected Node<K, V>[] cachedData;
     //* HashMap
-    protected SeparateChaining<K> dataPointer ;
+    protected SeparateChainingV1<K> dataPointer ;
     int size = 0, sizeMax;
     Node<K, V> first = null, last = null;
-    long misses = 0, hits=0, lookups=0;
+    long misses = 0, hits = 0, lookups = 0;
   
     @SuppressWarnings("unchecked")
-    CacheImpl8()
+    CacheImpl()
     {
         sizeMax = 100;
         cachedData = new Node[sizeMax];
     }
 
     @SuppressWarnings("unchecked")
-    CacheImpl8(int size)
+    CacheImpl(int size)
     {
         this.sizeMax = size;
         cachedData = new Node[sizeMax];
-        dataPointer = new SeparateChaining<K>(sizeMax);
+        dataPointer = new SeparateChainingV1<K>(sizeMax);
     }
 
 /**
@@ -33,27 +29,23 @@ public class CacheImpl8<K, V> implements Cache<K, V> {
 	 */
 	public V lookUp(K key)
     {
-		lookups++;
-        int index = 0;
-        //! search in HashMap for key and return the node's data
-        index = dataPointer.get(key);
+		++lookups;
+        //* search in HashMap for key and return the node's data
+        int index = dataPointer.get(key);
         if (index == -1)
         {
-        	misses++;
+        	++misses;
             return null;
         }
         else
         {
-        	hits++;
+        	++hits;
             if (cachedData[index] == last)
             {
                 first.next = last;
+                last.prev = first;
+
                 last = last.next;
-                
-                last.prev = null;
-                first.next.next = null;
-                
-                first.next.prev = first;
                 first = first.next;
             }
             else if (cachedData[index] != first) // no position update needed
@@ -63,11 +55,10 @@ public class CacheImpl8<K, V> implements Cache<K, V> {
 
                 first.next = cachedData[index];
                 cachedData[index].prev = first;
-                cachedData[index].next = null;
                 first = cachedData[index];
             }
 
-            return cachedData[index].getData();
+            return cachedData[index].data;
         }
     }
 	
@@ -81,27 +72,21 @@ public class CacheImpl8<K, V> implements Cache<K, V> {
     {
         if (sizeMax<=size)
         {
-            K lastKey = last.getKey();
+            K lastKey = last.key;
             int ind = dataPointer.get(lastKey);
             first.next = last;
+            last.prev = first;
             // replace data of last with new data
             last.data = value;
             last.key = key;
-            last.prev = first;
 
-            // remove connection between last and second from last
             last = last.next;
-            last.prev.next = null;
-            last.prev = null;
-
-            // finish movement of last to the start
-            first.next.prev = first;
             first = first.next;
             
-            //! delete lastKey from hashMap
+            //* delete lastKey from hashMap
             dataPointer.delete(lastKey);   
 
-            //! add to hashMap which points to index of lastKey, which is now first
+            //* add to hashMap which points to index of lastKey, which is now first
             dataPointer.put(key, ind);
         }
         else
@@ -132,8 +117,7 @@ public class CacheImpl8<K, V> implements Cache<K, V> {
 	public double getHitRatio()
     {
 		if(lookups>0L)		
-			return (double) hits/lookups;	
-			
+			return (double) hits/lookups;
 		else	
 			return 0;		
     }
