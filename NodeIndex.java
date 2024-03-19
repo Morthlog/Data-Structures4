@@ -15,7 +15,6 @@ public class NodeIndex<KEY, DATA>
      * Constructor. Sets data
      *
      * @param data the data stored
-     * @return
      */
     NodeIndex(KEY key, DATA data, int index) 
     {
