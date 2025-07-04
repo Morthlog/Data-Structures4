@@ -1,4 +1,4 @@
-# Data structures 3rd assignment
+# Data structures 4th assignment
 The goal of this project was to implement a **general-purpose LRU (Least Recently Used) Cache** in **Java**. The implementation supports **generic types** and focuses on **minimizing the time complexity** of cache operations, particularly for **lookups**. We were allowed to use **only** our own data structures implementations, except for arrays and the .io library to read the data and Exceptions. It was developed during the 3rd semester as part of the Data Structures course at AUEB.
 
 
